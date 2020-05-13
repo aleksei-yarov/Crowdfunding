@@ -1,25 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Алексей\\Documents\\GitHub\\Crowdfunding\\Crowdfunding.csproj": {}
+    "C:\\Users\\Галицкая Ангелина\\source\\repos\\Crowdfunding\\Crowdfunding.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Алексей\\Documents\\GitHub\\Crowdfunding\\Crowdfunding.csproj": {
+    "C:\\Users\\Галицкая Ангелина\\source\\repos\\Crowdfunding\\Crowdfunding.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Алексей\\Documents\\GitHub\\Crowdfunding\\Crowdfunding.csproj",
+        "projectUniqueName": "C:\\Users\\Галицкая Ангелина\\source\\repos\\Crowdfunding\\Crowdfunding.csproj",
         "projectName": "Crowdfunding",
-        "projectPath": "C:\\Users\\Алексей\\Documents\\GitHub\\Crowdfunding\\Crowdfunding.csproj",
-        "packagesPath": "C:\\Users\\Алексей\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Алексей\\Documents\\GitHub\\Crowdfunding\\obj\\",
+        "projectPath": "C:\\Users\\Галицкая Ангелина\\source\\repos\\Crowdfunding\\Crowdfunding.csproj",
+        "packagesPath": "C:\\Users\\Галицкая Ангелина\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Галицкая Ангелина\\source\\repos\\Crowdfunding\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Microsoft\\Xamarin\\NuGet\\"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Алексей\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\Галицкая Ангелина\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -58,9 +54,17 @@
               "target": "Package",
               "version": "[3.1.3, )"
             },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[3.1.2, )"
+            },
             "Microsoft.EntityFrameworkCore.Tools": {
               "target": "Package",
               "version": "[3.1.3, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[3.1.2, )"
             }
           },
           "imports": [

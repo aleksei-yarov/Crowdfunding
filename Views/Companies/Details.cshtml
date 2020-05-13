@@ -1,0 +1,106 @@
+﻿@model Crowdfunding.Models.Company
+
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+
+    <div>
+        <h4>Company</h4>
+        <hr />
+        @*<dl class="row">
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.Discription)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.Discription)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.TargetMoney)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.TargetMoney)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.EndDate)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.EndDate)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.CustomUser)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.CustomUser.UserName)
+            </dd>
+        </dl>*@
+        <div class="row">
+            <div class="col-6">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/LUO5qhpD2pA" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+                </iframe>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-4">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayFor(model => model.Name)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        @Html.DisplayNameFor(model => model.Discription)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayFor(model => model.Discription)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        @Html.DisplayNameFor(model => model.TargetMoney)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayFor(model => model.TargetMoney)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        @Html.DisplayNameFor(model => model.EndDate)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayFor(model => model.EndDate)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        @Html.DisplayNameFor(model => model.CustomUser)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayFor(model => model.CustomUser.UserName)
+                    </div>
+                </div>
+                        
+            </div>
+        </div>
+
+    </div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+</body>
+</html>

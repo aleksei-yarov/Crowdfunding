@@ -12,6 +12,7 @@ using Crowdfunding.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Crowdfunding.Models;
 
 namespace Crowdfunding
 {
@@ -30,7 +31,14 @@ namespace Crowdfunding
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<CustomUser>(options => {
+                options.Password.RequiredLength = 1;   // минимальная длина
+                options.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
+                options.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
+                options.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
+                options.Password.RequireDigit = false; // требуются ли цифры
+            })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -59,10 +67,14 @@ namespace Crowdfunding
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
+            {                
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}");                
+
+                endpoints.MapControllerRoute(
+                    name: "admin",
+                    pattern: "{controller}/{action}/{*data}");
                 endpoints.MapRazorPages();
             });
         }

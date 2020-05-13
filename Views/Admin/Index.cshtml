@@ -1,0 +1,109 @@
+﻿@model IEnumerable<Crowdfunding.Models.CustomUser>
+@{
+    ViewData["Title"] = "Index";
+}
+<link rel="stylesheet" href="~/css/table_active.css" />
+<h1>Admin</h1>
+
+<table class="table" id="table">
+    <tr>        
+        <th>
+            <input type="button" class="btn btn-sm btn-primary" value="Block" id="Block" />
+            <input type="button" class="btn btn-sm btn-primary" value="Unblock" id="Unblock" />
+            <input type="button" class="btn btn-sm btn-primary" value="Admin" id="SetAdmin" />
+            <input type="button" class="btn btn-sm btn-primary" value="Remove Admin" id="RemoveAdmin" />
+            <input type="button" class="btn btn-sm btn-primary" value="Delete" id="Delete" />
+        </th>
+    </tr>
+    <tr>        
+        <th><input type="checkbox" id="mainCheckbox">Login</th>
+        <th>Email</th>
+        <th>RegistrDate</th>
+        <th>Role</th>
+        <th>Lockout</th>
+
+    </tr>
+    @foreach (var user in Model)
+    {
+        <tr class="User" value=@user.Id>            
+            <td> @user.UserName </td>
+            <td>@user.Email</td>
+            <td>@user.RegistrDate</td>
+            @if (ViewBag.Admin.IndexOf(user) != -1)
+            {
+                <td>Admin</td>
+            }
+            else
+            {
+                <td>User</td>
+            }
+            @if (user.LockoutEnd == null)
+            {
+                <td> </td>
+            }
+            else
+            {
+                <td>BLOCKED </td>
+            }
+        </tr>
+    }
+</table>
+
+<script>
+    "use strict";
+
+    let mainCheckbox = document.getElementById("mainCheckbox");
+    mainCheckbox.addEventListener("click", function () {
+        let rows = document.querySelectorAll("tr.User");
+        for (let row of rows) {
+            if (mainCheckbox.checked) {
+                row.classList.add("selectedRow");
+            }
+            else {
+                row.classList.remove("selectedRow");
+            }
+        }
+    });
+
+    function buttonAction(event) {
+        let selectedUser = document.getElementsByClassName("selectedRow");
+        let url = "/Admin/" + event.target.getAttribute("Id");
+        for (let elem of selectedUser) {
+            url += "/" + elem.getAttribute("value");
+        }
+        window.location.href = url;
+    }
+
+    let buttonBlock = document.getElementById("Block");
+    buttonBlock.addEventListener("click", buttonAction);
+
+    let buttonUnblock = document.getElementById("Unblock");
+    buttonUnblock.addEventListener("click", buttonAction);
+
+    let buttonDelete = document.getElementById("Delete");
+    buttonDelete.addEventListener("click", buttonAction);
+
+    let buttonAdmin = document.getElementById("SetAdmin");
+    buttonAdmin.addEventListener("click", buttonAction);
+
+    let buttonRemoveAdmin = document.getElementById("RemoveAdmin");
+    buttonRemoveAdmin.addEventListener("click", buttonAction);
+
+    let table = document.getElementById("table");
+    table.addEventListener("click", function (event) {        
+        let target = event.target;
+        if (target.tagName != 'TD') return;
+        selectRow(target.parentElement);
+    });
+
+    function selectRow(row){
+        if (row.classList.contains("selectedRow")) {
+            row.classList.remove("selectedRow");
+        }
+        else {
+            row.classList.add("selectedRow");
+        }
+    };
+    
+    
+</script>
