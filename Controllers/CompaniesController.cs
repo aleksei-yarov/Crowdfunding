@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Crowdfunding.Data;
 using Crowdfunding.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Diagnostics;
 
 namespace Crowdfunding.Controllers
 {
@@ -27,10 +28,11 @@ namespace Crowdfunding.Controllers
         {
             if (User.IsInRole("Admin"))
             {
-                var applicationDbContextAdmin = _context.Companies.Include(c => c.CustomUser);
+                var applicationDbContextAdmin = _context.Companies.Include(c => c.CustomUser).Include(x => x.Category);
                 return View(await applicationDbContextAdmin.ToListAsync());
             }
-            var applicationDbContext = _context.Companies.Include(c => c.CustomUser).Where(x => x.CustomUser.UserName == User.Identity.Name);
+            var applicationDbContext = _context.Companies.Include(c => c.CustomUser).Where(x => x.CustomUser.UserName == User.Identity.Name)
+                .Include(c => c.Category);
             return View(await applicationDbContext.ToListAsync());
 
         }
@@ -41,16 +43,23 @@ namespace Crowdfunding.Controllers
             if (id == null)
             {
                 return NotFound();
-            }
-
+            }             
             var company = await _context.Companies
-                .Include(c => c.CustomUser)
+                .Include(c => c.CustomUser).Include(x => x.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (company == null)
             {
                 return NotFound();
             }
-
+            if (company.YoutubeSrc != null)
+            {
+                ViewBag.Youtube = company.YoutubeSrc.Replace("watch?v=", "embed/");
+            }
+            else
+            {
+                ViewBag.Youtube = "https://www.youtube.com/embed/gsqsulWrhfQ";
+            }
+                       
             return View(company);
         }
 
@@ -58,6 +67,7 @@ namespace Crowdfunding.Controllers
         public IActionResult Create()
         {
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName");
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             ViewBag.UserId = _userManager.GetUserId(User);
             return View();
         }
@@ -67,8 +77,9 @@ namespace Crowdfunding.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Discription,TargetMoney,EndDate,CustomUserId")] Company company)
-        {
+        public async Task<IActionResult> Create([Bind("Id,Name,Discription,TargetMoney," +
+            "EndDate,CustomUserId,CategoryId,YoutubeSrc")] Company company, List<string> Tags)
+        {          
             var temp = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Name == company.Name);
             if (temp != null)
             {
@@ -76,11 +87,13 @@ namespace Crowdfunding.Controllers
             }
             if (ModelState.IsValid)
             {
+                company.Tags = GetAllTags(Tags);
                 _context.Add(company);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName");
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             ViewBag.UserId = _userManager.GetUserId(User);
             return View(company);
         }
@@ -99,6 +112,7 @@ namespace Crowdfunding.Controllers
                 return NotFound();
             }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName", company.CustomUserId);
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             ViewBag.UserId = (await _userManager.GetUserAsync(User)).Id;
             return View(company);
         }
@@ -108,7 +122,7 @@ namespace Crowdfunding.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Discription,TargetMoney,EndDate,CustomUserId")] Company company)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Discription,TargetMoney,EndDate,CustomUserId,CategoryId,YoutubeSrc")] Company company)
         {
             if (id != company.Id)
             {
@@ -125,6 +139,7 @@ namespace Crowdfunding.Controllers
             {
                 try
                 {
+                    
                     _context.Update(company);
                     await _context.SaveChangesAsync();
                 }
@@ -135,13 +150,14 @@ namespace Crowdfunding.Controllers
                         return NotFound();
                     }
                     else
-                    {
+                    {    
                         throw;
                     }
                 }
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName", company.CustomUserId);
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", company.CategoryId);
             ViewBag.UserId = (await _userManager.GetUserAsync(User)).Id;
             return View(company);
         }
@@ -179,6 +195,40 @@ namespace Crowdfunding.Controllers
         private bool CompanyExists(int id)
         {
             return _context.Companies.Any(e => e.Id == id);
+        }
+
+        private string GetAllTags(List<string> TagsList)
+        {
+            string Tags = "";
+            foreach(var elem in TagsList)
+            {
+                Tag tag = new Tag { Name = elem };
+                var temp = _context.Tags.FirstOrDefault(x => x.Name == tag.Name);
+                if (temp == null)
+                {
+                    _context.Add(tag);
+                    _context.SaveChanges();
+                }                
+                Tags += elem + ",";
+            }
+            return Tags;
+
+        }
+
+        [Produces("application/json")]
+        [HttpGet("search")]
+        public async Task<IActionResult> Search()
+        {
+            try
+            {
+                string term = HttpContext.Request.Query["term"].ToString();
+                var names = _context.Tags.Where(p => p.Name.Contains(term)).Select(p => p.Name).ToList();
+                return Ok(names);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

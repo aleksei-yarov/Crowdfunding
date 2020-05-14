@@ -13,42 +13,10 @@
 
     <div>
         <h4>Company</h4>
-        <hr />
-        @*<dl class="row">
-            <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd class = "col-sm-10">
-                @Html.DisplayFor(model => model.Name)
-            </dd>
-            <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.Discription)
-            </dt>
-            <dd class = "col-sm-10">
-                @Html.DisplayFor(model => model.Discription)
-            </dd>
-            <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.TargetMoney)
-            </dt>
-            <dd class = "col-sm-10">
-                @Html.DisplayFor(model => model.TargetMoney)
-            </dd>
-            <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.EndDate)
-            </dt>
-            <dd class = "col-sm-10">
-                @Html.DisplayFor(model => model.EndDate)
-            </dd>
-            <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.CustomUser)
-            </dt>
-            <dd class = "col-sm-10">
-                @Html.DisplayFor(model => model.CustomUser.UserName)
-            </dd>
-        </dl>*@
+        <hr />        
         <div class="row">
             <div class="col-6">
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/LUO5qhpD2pA" frameborder="0"
+                <iframe width="560" height="315" src="@ViewBag.Youtube" frameborder="0"
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
                 </iframe>
             </div>
@@ -87,13 +55,21 @@
                 </div>
                 <div class="row">
                     <div class="col-4">
+                        @Html.DisplayNameFor(model => model.Category)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayFor(model => model.Category.Name)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
                         @Html.DisplayNameFor(model => model.CustomUser)
                     </div>
                     <div class="col-8">
                         @Html.DisplayFor(model => model.CustomUser.UserName)
                     </div>
                 </div>
-                        
+
             </div>
         </div>
 

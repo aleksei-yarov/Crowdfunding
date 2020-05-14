@@ -10,9 +10,11 @@ namespace Crowdfunding.Data
     public class ApplicationDbContext : IdentityDbContext<CustomUser>
     {       
         public DbSet<Company> Companies { get; set; }
+        public DbSet<Category> Categories { get; set; } 
+        public DbSet<Tag> Tags { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-        }
+        }        
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,8 +17,14 @@ namespace Crowdfunding.Models
         public string Discription { get; set; }
         [Required]
         public double TargetMoney { get; set; }
-        public DateTime EndDate { get; set; }        
+        public double CurrentMoney { get; set; }
+        public DateTime? EndDate { get; set; }
+        [RegularExpression(@"https://www.youtube.com/watch\?v=.{11}", ErrorMessage = "Invalid url")]
+        public string YoutubeSrc { get; set; }
         public string CustomUserId { get; set; }
-        public CustomUser CustomUser { get; set; }
+        public CustomUser CustomUser { get; set; } 
+        public int? CategoryId { get; set; }
+        public Category Category { get; set; }
+        public string Tags { get; set; }
     }
 }
