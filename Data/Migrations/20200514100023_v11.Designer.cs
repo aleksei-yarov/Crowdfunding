@@ -4,43 +4,22 @@ using Crowdfunding.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crowdfunding.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200514100023_v11")]
+    partial class v11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Crowdfunding.Models.Bonus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Bonuses");
-                });
 
             modelBuilder.Entity("Crowdfunding.Models.Category", b =>
                 {
@@ -84,6 +63,9 @@ namespace Crowdfunding.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Tags")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("TargetMoney")
                         .HasColumnType("float");
 
@@ -97,21 +79,6 @@ namespace Crowdfunding.Data.Migrations
                     b.HasIndex("CustomUserId");
 
                     b.ToTable("Companies");
-                });
-
-            modelBuilder.Entity("Crowdfunding.Models.CompanyTag", b =>
-                {
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TagId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CompanyId", "TagId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("CompanyTag");
                 });
 
             modelBuilder.Entity("Crowdfunding.Models.CustomUser", b =>
@@ -180,21 +147,6 @@ namespace Crowdfunding.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("Crowdfunding.Models.Tag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -332,13 +284,6 @@ namespace Crowdfunding.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Crowdfunding.Models.Bonus", b =>
-                {
-                    b.HasOne("Crowdfunding.Models.Company", "Company")
-                        .WithMany("Bonuses")
-                        .HasForeignKey("CompanyId");
-                });
-
             modelBuilder.Entity("Crowdfunding.Models.Company", b =>
                 {
                     b.HasOne("Crowdfunding.Models.Category", "Category")
@@ -348,21 +293,6 @@ namespace Crowdfunding.Data.Migrations
                     b.HasOne("Crowdfunding.Models.CustomUser", "CustomUser")
                         .WithMany("Companies")
                         .HasForeignKey("CustomUserId");
-                });
-
-            modelBuilder.Entity("Crowdfunding.Models.CompanyTag", b =>
-                {
-                    b.HasOne("Crowdfunding.Models.Company", "Company")
-                        .WithMany("CompanyTags")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Crowdfunding.Models.Tag", "Tag")
-                        .WithMany("CompanyTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

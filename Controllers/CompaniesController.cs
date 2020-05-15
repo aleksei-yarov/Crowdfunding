@@ -25,16 +25,17 @@ namespace Crowdfunding.Controllers
 
         // GET: Companies
         public async Task<IActionResult> Index()
-        {
-            if (User.IsInRole("Admin"))
-            {
-                var applicationDbContextAdmin = _context.Companies.Include(c => c.CustomUser).Include(x => x.Category);
-                return View(await applicationDbContextAdmin.ToListAsync());
-            }
+        {            
             var applicationDbContext = _context.Companies.Include(c => c.CustomUser).Where(x => x.CustomUser.UserName == User.Identity.Name)
                 .Include(c => c.Category);
             return View(await applicationDbContext.ToListAsync());
 
+        }
+
+        public async Task<IActionResult> AllCompanies()
+        {            
+           var allCompany = _context.Companies.Include(c => c.CustomUser).Include(x => x.Category);
+           return View(await allCompany.ToListAsync()); 
         }
 
         // GET: Companies/Details/5
@@ -45,7 +46,7 @@ namespace Crowdfunding.Controllers
                 return NotFound();
             }             
             var company = await _context.Companies
-                .Include(c => c.CustomUser).Include(x => x.Category)
+                .Include(c => c.CustomUser).Include(x => x.Category).Include(x => x.Bonuses)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (company == null)
             {
@@ -87,7 +88,8 @@ namespace Crowdfunding.Controllers
             }
             if (ModelState.IsValid)
             {
-                company.Tags = GetAllTags(Tags);
+                SaveTags(Tags);
+                AddTagsToCompany(Tags, company);
                 _context.Add(company);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -104,16 +106,21 @@ namespace Crowdfunding.Controllers
             if (id == null)
             {
                 return NotFound();
-            }
-
-            var company = await _context.Companies.FindAsync(id);
+            }             
+            var company = await _context.Companies.Include(x => x.CustomUser)
+                .Include(x => x.CompanyTags).ThenInclude(x => x.Tag).FirstOrDefaultAsync(x => x.Id == id);
             if (company == null)
             {
                 return NotFound();
             }
+            if (User.Identity.Name != company.CustomUser.UserName)
+            {
+                return View(nameof(NoPermission));
+            }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName", company.CustomUserId);
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             ViewBag.UserId = (await _userManager.GetUserAsync(User)).Id;
+            ViewBag.Tags = GetTags(company);
             return View(company);
         }
 
@@ -138,8 +145,7 @@ namespace Crowdfunding.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
-                    
+                {                    
                     _context.Update(company);
                     await _context.SaveChangesAsync();
                 }
@@ -164,32 +170,24 @@ namespace Crowdfunding.Controllers
 
         // GET: Companies/Delete/5
         public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var company = await _context.Companies
-                .Include(c => c.CustomUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
+        {            
+            var company = await _context.Companies.Include(x => x.CustomUser).FirstOrDefaultAsync(x => x.Id == id);
             if (company == null)
             {
                 return NotFound();
             }
-
-            return View(company);
-        }
-
-        // POST: Companies/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var company = await _context.Companies.FindAsync(id);
+            if (User.Identity.Name != company.CustomUser.UserName)
+            {
+                return RedirectToAction(nameof(NoPermission));
+            }
             _context.Companies.Remove(company);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+        
+        public async Task<IActionResult> NoPermission()
+        {
+            return View();
         }
 
         private bool CompanyExists(int id)
@@ -197,22 +195,44 @@ namespace Crowdfunding.Controllers
             return _context.Companies.Any(e => e.Id == id);
         }
 
-        private string GetAllTags(List<string> TagsList)
+        private void SaveTags(List<string> TagList)
         {
-            string Tags = "";
-            foreach(var elem in TagsList)
+            foreach (var elem in TagList)
             {
-                Tag tag = new Tag { Name = elem };
-                var temp = _context.Tags.FirstOrDefault(x => x.Name == tag.Name);
-                if (temp == null)
+                if (elem != null && !_context.Tags.Any(e => e.Name == elem))
                 {
-                    _context.Add(tag);
+                    Tag Tag = new Tag { Name = elem };
+                    _context.Add(Tag);
                     _context.SaveChanges();
-                }                
-                Tags += elem + ",";
+                }
+            }
+        }
+
+        private void AddTagsToCompany(List<string> TagList, Company company)
+        {
+            foreach(var elem in TagList)
+            {     
+                if (elem != null)
+                {
+                    var tempId = _context.Tags.AsNoTracking().FirstOrDefault(x => x.Name == elem).Id;
+                    company.CompanyTags.Add(new CompanyTag{CompanyId = company.Id, TagId = tempId});
+                }
+            }
+        }
+
+        private List<string> GetTags (Company company)
+        {
+            List<string> Tags = new List<string>();
+            foreach(var elem in company.CompanyTags)
+            {
+                Tags.Add(elem.Tag.Name);
+            }
+            if (Tags.Count != 2)
+            {
+                Tags.Add("");
+                Tags.Add("");
             }
             return Tags;
-
         }
 
         [Produces("application/json")]

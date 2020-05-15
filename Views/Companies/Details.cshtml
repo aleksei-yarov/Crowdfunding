@@ -1,82 +1,68 @@
 ﻿@model Crowdfunding.Models.Company
 
-
-
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Details</title>
-</head>
-<body>
-
-    <div>
-        <h4>Company</h4>
-        <hr />        
-        <div class="row">
-            <div class="col-6">
-                <iframe width="560" height="315" src="@ViewBag.Youtube" frameborder="0"
-                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-                </iframe>
-            </div>
-            <div class="col-6">
-                <div class="row">
-                    <div class="col-4">
-                        @Html.DisplayNameFor(model => model.Name)
-                    </div>
-                    <div class="col-8">
-                        @Html.DisplayFor(model => model.Name)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        @Html.DisplayNameFor(model => model.Discription)
-                    </div>
-                    <div class="col-8">
-                        @Html.DisplayFor(model => model.Discription)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        @Html.DisplayNameFor(model => model.TargetMoney)
-                    </div>
-                    <div class="col-8">
-                        @Html.DisplayFor(model => model.TargetMoney)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        @Html.DisplayNameFor(model => model.EndDate)
-                    </div>
-                    <div class="col-8">
-                        @Html.DisplayFor(model => model.EndDate)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        @Html.DisplayNameFor(model => model.Category)
-                    </div>
-                    <div class="col-8">
-                        @Html.DisplayFor(model => model.Category.Name)
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        @Html.DisplayNameFor(model => model.CustomUser)
-                    </div>
-                    <div class="col-8">
-                        @Html.DisplayFor(model => model.CustomUser.UserName)
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <h4>@Html.DisplayFor(model => model.Name)</h4>
+    <hr />        
+    <div class="row">
+        <div class="col-6">
+            <iframe width="560" height="315" src="@ViewBag.Youtube" frameborder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+            </iframe>
+        </div>
+        <div class="col-6">
+            <div class="row">
+                <div class="col-4">
+                    @Html.DisplayNameFor(model => model.Category)
+                </div>
+                <div class="col-8">
+                    @Html.DisplayFor(model => model.Category.Name)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    @Html.DisplayNameFor(model => model.CurrentMoney)
+                </div>
+                <div class="col-8">
+                    @Html.DisplayFor(model => model.CurrentMoney)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    @Html.DisplayNameFor(model => model.TargetMoney)
+                </div>
+                <div class="col-8">
+                    @Html.DisplayFor(model => model.TargetMoney)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    @Html.DisplayNameFor(model => model.EndDate)
+                </div>
+                <div class="col-8">
+                    @Html.DisplayFor(model => model.EndDate)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    @Html.DisplayNameFor(model => model.CustomUser)
+                </div>
+                <div class="col-8">
+                    @Html.DisplayFor(model => model.CustomUser.UserName)
+                </div>
+            </div>
+            <form asp-controller="Bonus" asp-action="Index" asp-route-companyId="@Model.Id" >
+                <button>Support</button>
+            </form>
+        </div>
+    </div>
 </div>
-</body>
-</html>
+<div>
+    <a asp-action="Index">Back to List</a> |
+    @if (User.Identity.Name == Model.CustomUser.UserName || User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> 
+        <a asp-controller="Bonus" asp-action="Create" asp-route-companyId="@Model.Id">| Create New Bonus |</a> 
+        <a asp-controller="Bonus" asp-action="Index" asp-route-companyId="@Model.Id">View Bonuses</a>
+    }
+
+</div>

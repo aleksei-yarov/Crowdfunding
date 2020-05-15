@@ -12,9 +12,27 @@ namespace Crowdfunding.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<Category> Categories { get; set; } 
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Bonus> Bonuses { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-        }        
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder); // без этого нельзя перезаписывать OnModelCreating
+            modelBuilder.Entity<CompanyTag>()
+                .HasKey(t => new { t.CompanyId, t.TagId });
+
+            modelBuilder.Entity<CompanyTag>()
+                .HasOne(sc => sc.Company)
+                .WithMany(s => s.CompanyTags)
+                .HasForeignKey(sc => sc.CompanyId);
+
+            modelBuilder.Entity<CompanyTag>()
+                .HasOne(sc => sc.Tag)
+                .WithMany(c => c.CompanyTags)
+                .HasForeignKey(sc => sc.TagId);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,6 +26,12 @@ namespace Crowdfunding.Models
         public CustomUser CustomUser { get; set; } 
         public int? CategoryId { get; set; }
         public Category Category { get; set; }
-        public string Tags { get; set; }
+        public List<CompanyTag> CompanyTags { get; set; }
+        public Company()
+        {
+            CompanyTags = new List<CompanyTag>();
+        } 
+        public List<Bonus> Bonuses { get; set; }
+
     }
 }

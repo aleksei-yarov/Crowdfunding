@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 
 namespace Crowdfunding.Models
 {
-    public class Tag
+    public class Bonus
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<CompanyTag> CompanyTags { get; set; }
-        public Tag()
-        {
-            CompanyTags = new List<CompanyTag>();
-        }
+        public double Price { get; set; }
+        public int? CompanyId { get; set; }
+        public Company Company { get; set; }
+
     }
 }
