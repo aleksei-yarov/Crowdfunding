@@ -33,7 +33,7 @@ namespace Crowdfunding.Controllers
             return View(companyBonuses);
         }
 
-        public IActionResult Create(int? companyId, List<string> modelErrors)
+        public async Task<IActionResult> Create(int? companyId, List<string> modelErrors)
         {
             if (companyId == null)
             {
@@ -43,6 +43,10 @@ namespace Crowdfunding.Controllers
             {
                 var error = elem.Split("//");
                 ModelState.AddModelError(error[0], error[1]);
+            }            
+            if (PermissionToCreate(companyId) == false)
+            {
+                return RedirectToAction("NoPermission", "Companies");
             }
             ViewBag.CompanyId = companyId;
             return View();
@@ -88,7 +92,12 @@ namespace Crowdfunding.Controllers
                     ModelState.AddModelError(error[0], error[1]);
                 }
             }
-            var bonus = await _context.Bonuses.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var bonus = await _context.Bonuses.AsNoTracking().Include(x => x.Company).ThenInclude(x => x.CustomUser)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (PermissionToCreate(companyId) == false)
+            {
+                return RedirectToAction("NoPermission", "Companies");
+            }
             ViewBag.CompanyId = companyId;
             return View(bonus);
         }
@@ -120,9 +129,18 @@ namespace Crowdfunding.Controllers
                 modelErrors = modelErrors});
         }
 
-        public async Task<IActionResult> Delete(int id, int companyId)
+        public async Task<IActionResult> Delete(int? id, int? companyId)
         {
-            var bonus = await _context.Bonuses.FindAsync(id);
+            if (id == null || companyId == null)
+            {
+                return NotFound();
+            }
+            var bonus = await _context.Bonuses.Include(x => x.Company)
+                .ThenInclude(x => x.CustomUser).FirstOrDefaultAsync(x => x.Id == id);
+            if (PermissionToCreate(companyId) == false)
+            {
+                return RedirectToAction("NoPermission", "Companies");
+            }
             _context.Bonuses.Remove(bonus);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index), new { companyId = companyId});
@@ -144,5 +162,19 @@ namespace Crowdfunding.Controllers
             }
             return result;
         }
+
+        public bool PermissionToCreate(int? companyId)
+        {
+            var userId =  _context.Users.FirstOrDefault(x => x.UserName == User.Identity.Name).Id;
+            var userCompanies =  _context.Companies.Where(x => x.CustomUserId == userId).Select(x => x.Id).ToList();
+            int intCompanyId = companyId.GetValueOrDefault();
+            if (userCompanies.IndexOf(intCompanyId) != -1 || User.IsInRole("Admin") == true)
+            {
+                return (true);
+            }
+            return (false);
+        }
+
+        
     }
 }

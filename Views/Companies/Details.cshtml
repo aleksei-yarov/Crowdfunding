@@ -50,19 +50,20 @@
                     @Html.DisplayFor(model => model.CustomUser.UserName)
                 </div>
             </div>
-            <form asp-controller="Bonus" asp-action="Index" asp-route-companyId="@Model.Id" >
+            <form asp-controller="Bonus" asp-action="Index" asp-route-companyId="@Model.Id">
                 <button>Support</button>
             </form>
+            <div>
+                <a asp-action="AllCompanies">Back to List</a> 
+                @if (User.Identity.Name == Model.CustomUser.UserName || User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.Id"> | Edit </a>
+                    <a asp-controller="Bonus" asp-action="Create" asp-route-companyId="@Model.Id">| Create New Bonus |</a>
+                    <a asp-controller="Bonus" asp-action="Index" asp-route-companyId="@Model.Id">View Bonuses</a>
+                }
+
+            </div>
         </div>
     </div>
 </div>
-<div>
-    <a asp-action="Index">Back to List</a> |
-    @if (User.Identity.Name == Model.CustomUser.UserName || User.IsInRole("Admin"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> 
-        <a asp-controller="Bonus" asp-action="Create" asp-route-companyId="@Model.Id">| Create New Bonus |</a> 
-        <a asp-controller="Bonus" asp-action="Index" asp-route-companyId="@Model.Id">View Bonuses</a>
-    }
 
-</div>

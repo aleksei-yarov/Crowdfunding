@@ -27,7 +27,7 @@ namespace Crowdfunding.Controllers
         public async Task<IActionResult> Index()
         {            
             var applicationDbContext = _context.Companies.Include(c => c.CustomUser).Where(x => x.CustomUser.UserName == User.Identity.Name)
-                .Include(c => c.Category);
+                .Include(c => c.Category).Include(x => x.Bonuses);
             return View(await applicationDbContext.ToListAsync());
 
         }
@@ -78,8 +78,7 @@ namespace Crowdfunding.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Discription,TargetMoney," +
-            "EndDate,CustomUserId,CategoryId,YoutubeSrc")] Company company, List<string> Tags)
+        public async Task<IActionResult> Create(Company company, List<string> Tags)
         {          
             var temp = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Name == company.Name);
             if (temp != null)
@@ -113,7 +112,7 @@ namespace Crowdfunding.Controllers
             {
                 return NotFound();
             }
-            if (User.Identity.Name != company.CustomUser.UserName)
+            if (User.Identity.Name != company.CustomUser.UserName && User.IsInRole("Admin") != true)
             {
                 return View(nameof(NoPermission));
             }
@@ -129,14 +128,15 @@ namespace Crowdfunding.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Discription,TargetMoney,EndDate,CustomUserId,CategoryId,YoutubeSrc")] Company company)
+        public async Task<IActionResult> Edit(int id, Company company, List<string> Tags)
         {
             if (id != company.Id)
             {
                 return NotFound();
             }
 
-            var temp = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Name == company.Name);
+            var temp = await _context.Companies.AsNoTracking().Include(x => x.CompanyTags)
+                .FirstOrDefaultAsync(x => x.Name == company.Name);
             if (temp != null && temp.Id != company.Id)
             {
                 ModelState.AddModelError(nameof(company.Name), "A company with the same name already exists.");
@@ -145,9 +145,11 @@ namespace Crowdfunding.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {                    
+                {
                     _context.Update(company);
                     await _context.SaveChangesAsync();
+                    ChangeTag(Tags, id);                    
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -170,13 +172,14 @@ namespace Crowdfunding.Controllers
 
         // GET: Companies/Delete/5
         public async Task<IActionResult> Delete(int? id)
-        {            
-            var company = await _context.Companies.Include(x => x.CustomUser).FirstOrDefaultAsync(x => x.Id == id);
+        {
+            var company = await _context.Companies.Include(x => x.CustomUser).Include(x => x.Bonuses)
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (company == null)
             {
                 return NotFound();
             }
-            if (User.Identity.Name != company.CustomUser.UserName)
+            if (User.Identity.Name != company.CustomUser.UserName && User.IsInRole("Admin") != true)
             {
                 return RedirectToAction(nameof(NoPermission));
             }
@@ -216,7 +219,35 @@ namespace Crowdfunding.Controllers
                 {
                     var tempId = _context.Tags.AsNoTracking().FirstOrDefault(x => x.Name == elem).Id;
                     company.CompanyTags.Add(new CompanyTag{CompanyId = company.Id, TagId = tempId});
+                    _context.SaveChanges();
                 }
+            }
+        }
+
+        private void ChangeTag(List<string> TagList, int? companyId)
+        {
+            var company = _context.Companies.Include(x => x.CompanyTags)
+                .ThenInclude(x => x.Tag).FirstOrDefault(x => x.Id == companyId);
+            var oldTags = new List<string>();
+            foreach(var elem in company.CompanyTags)
+            {
+                oldTags.Add(elem.Tag.Name);
+            }
+            var newTags = TagList.Except(oldTags).ToList();
+            SaveTags(newTags);
+            AddTagsToCompany(newTags, company);
+            DeleteTagsFromCompany(oldTags.Except(TagList).ToList(), company);      
+            
+        }
+
+        private void DeleteTagsFromCompany(List<string> TagList, Company company)
+        {
+            foreach(var tagName in TagList)
+            {
+                var tag = _context.Tags.FirstOrDefault(x => x.Name == tagName);
+                var companyTag = company.CompanyTags.FirstOrDefault(x => x.TagId == tag.Id);
+                company.CompanyTags.Remove(companyTag);
+                _context.SaveChanges();
             }
         }
 
@@ -229,8 +260,8 @@ namespace Crowdfunding.Controllers
             }
             if (Tags.Count != 2)
             {
-                Tags.Add("");
-                Tags.Add("");
+                Tags.Add(null);
+                Tags.Add(null);
             }
             return Tags;
         }
