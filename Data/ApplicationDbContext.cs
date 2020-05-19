@@ -33,6 +33,19 @@ namespace Crowdfunding.Data
                 .HasOne(sc => sc.Tag)
                 .WithMany(c => c.CompanyTags)
                 .HasForeignKey(sc => sc.TagId);
+
+            modelBuilder.Entity<CustomUserBonus>()
+                .HasKey(t => new { t.CustomUserId, t.BonusId });
+
+            modelBuilder.Entity<CustomUserBonus>()
+                .HasOne(sc => sc.CustomUser)
+                .WithMany(s => s.CustomUserBonus)
+                .HasForeignKey(sc => sc.CustomUserId);
+
+            modelBuilder.Entity<CustomUserBonus>()
+                .HasOne(sc => sc.Bonus)
+                .WithMany(c => c.CustomUserBonus)
+                .HasForeignKey(sc => sc.BonusId);
         }
     }
 }

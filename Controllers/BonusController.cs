@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Crowdfunding.Data;
 using Crowdfunding.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,12 @@ namespace Crowdfunding.Controllers
 
     public class BonusController : Controller
     {
+        public UserManager<CustomUser> _userManager { get; }
+
         private readonly ApplicationDbContext _context;
-        public BonusController(ApplicationDbContext context)
+        public BonusController(ApplicationDbContext context, UserManager<CustomUser> userManager)
         {
+            _userManager = userManager;
             _context = context;
         }
 
@@ -28,7 +32,11 @@ namespace Crowdfunding.Controllers
             {
                 return NotFound();
             }
-            var companyBonuses = await _context.Bonuses.Include(x => x.Company).Where(x => x.CompanyId == companyId).ToListAsync();
+            var companyBonuses = await _context.Bonuses.Include(x => x.Company).ThenInclude(x => x.CustomUser)
+                .Where(x => x.CompanyId == companyId).ToListAsync();
+            var company = await _context.Companies.Include(x => x.CustomUser)
+                .FirstOrDefaultAsync(x => x.Id == companyId);
+            ViewBag.UserNameCompanyOwner = company.CustomUser.UserName;
             ViewBag.CompanyId = companyId;
             return View(companyBonuses);
         }
@@ -53,7 +61,7 @@ namespace Crowdfunding.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(int? companyId, [Bind("Id, Name, Price, CompanyId")] Bonus bonus)
+        public async Task<IActionResult> Create(int? companyId, Bonus bonus)
         {
             if (companyId == null)
             {
@@ -73,7 +81,7 @@ namespace Crowdfunding.Controllers
             }
             else
             {
-                modelErrors = GetErrors(ModelState);
+                modelErrors = GetModelErrors(ModelState);
             }
             return RedirectToAction(nameof(Create), new { companyId = companyId, modelErrors = modelErrors});
         }
@@ -103,7 +111,7 @@ namespace Crowdfunding.Controllers
         }
 
         [HttpPost]        
-        public async Task<IActionResult> Edit(int? id, int? companyId, [Bind("Id, Name,Price, CompanyId")]Bonus bonus)
+        public async Task<IActionResult> Edit(int? id, int? companyId, Bonus bonus)
         {            
             if (id == null || companyId == null)
             {
@@ -123,7 +131,7 @@ namespace Crowdfunding.Controllers
             }
             else
             {
-                modelErrors = GetErrors(ModelState);
+                modelErrors = GetModelErrors(ModelState);
             }
             return RedirectToAction(nameof(Edit), new { id = id, companyId = companyId, 
                 modelErrors = modelErrors});
@@ -146,7 +154,39 @@ namespace Crowdfunding.Controllers
             return RedirectToAction(nameof(Index), new { companyId = companyId});
         }
 
-        public List<string> GetErrors(ModelStateDictionary modelState)
+        public async Task<IActionResult> PaymentCheck(int? id)
+        {
+            var bonus = await _context.Bonuses.FirstOrDefaultAsync(x => x.Id == id);
+            if (bonus == null)
+            {
+                return NotFound();
+            }            
+            return View(bonus);
+        }
+        
+        public async Task<IActionResult> Payment(int? bonusId)
+        {            
+            var bonus = await _context.Bonuses.FirstOrDefaultAsync(x => x.Id == bonusId);
+            var company = await _context.Companies.FirstOrDefaultAsync(x => x.Id == bonus.CompanyId);
+            if (bonus == null)
+            {
+                return NotFound();
+            }
+            bonus.CustomUserBonus.Add(new CustomUserBonus { BonusId = bonus.Id, CustomUserId = _userManager.GetUserId(User) });
+            company.CurrentMoney += bonus.Price;
+            _context.Update(company);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", "Companies", new { id = bonus.CompanyId });
+        }
+
+        public async Task<IActionResult> MyBonuses()
+        {
+            var user = await _context.Users.Include(x => x.CustomUserBonus)
+                .ThenInclude(x => x.Bonus).ThenInclude(x => x.Company).FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
+            
+            return View(user.CustomUserBonus);
+        }
+        public List<string> GetModelErrors(ModelStateDictionary modelState)
         {
             var result = new List<string>();
             var erroneousFields = modelState.Where(ms => ms.Value.Errors.Any())

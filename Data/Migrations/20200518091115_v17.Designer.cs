@@ -4,14 +4,16 @@ using Crowdfunding.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crowdfunding.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200518091115_v17")]
+    partial class v17
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,7 +32,6 @@ namespace Crowdfunding.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -185,21 +186,6 @@ namespace Crowdfunding.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("Crowdfunding.Models.CustomUserBonus", b =>
-                {
-                    b.Property<string>("CustomUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("BonusId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CustomUserId", "BonusId");
-
-                    b.HasIndex("BonusId");
-
-                    b.ToTable("CustomUserBonus");
                 });
 
             modelBuilder.Entity("Crowdfunding.Models.Tag", b =>
@@ -381,21 +367,6 @@ namespace Crowdfunding.Data.Migrations
                     b.HasOne("Crowdfunding.Models.Tag", "Tag")
                         .WithMany("CompanyTags")
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Crowdfunding.Models.CustomUserBonus", b =>
-                {
-                    b.HasOne("Crowdfunding.Models.Bonus", "Bonus")
-                        .WithMany("CustomUserBonus")
-                        .HasForeignKey("BonusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Crowdfunding.Models.CustomUser", "CustomUser")
-                        .WithMany("CustomUserBonus")
-                        .HasForeignKey("CustomUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -1,0 +1,40 @@
+﻿@model Crowdfunding.Models.Bonus
+
+
+<div class="row">
+    <div class="col-md-2">
+        @Html.DisplayNameFor(model => model.Name)
+    </div>
+    <div class="col-md-4">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        @Html.DisplayNameFor(model => model.Description)
+    </div>
+    <div class="col-md-4">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        @Html.DisplayNameFor(model => model.Price)
+    </div>
+    <div class="col-md-4">
+        @Html.DisplayFor(model => model.Price)
+    </div>
+</div>
+
+<hr />
+
+<a asp-action="Payment" asp-route-bonusId="@Model.Id">
+    <input type="button" value="Pay" class="btn btn-sm btn-primary">
+</a> 
+
+<hr />
+<div>
+    <a asp-action="Index" asp-route-companyId="@Model.CompanyId">Back to Bonuses</a> |
+    <a asp-controller="Companies" asp-action="Details" asp-route-id="@Model.CompanyId">Back to Company</a>
+</div>
+

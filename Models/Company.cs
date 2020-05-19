@@ -15,7 +15,7 @@ namespace Crowdfunding.Models
         [Display(Name = "Company name")]
         public string Name { get; set; }
         [Required]
-        public string Discription { get; set; }
+        public string Description { get; set; }
         [Required]
         public double TargetMoney { get; set; }
         public double CurrentMoney { get; set; }

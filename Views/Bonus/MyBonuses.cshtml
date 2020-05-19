@@ -1,0 +1,47 @@
+﻿
+@model IEnumerable<CustomUserBonus>
+
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Bonus.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Bonus.Price)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Bonus.Description)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Bonus.Company.Name)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Bonus.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Bonus.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Bonus.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Bonus.Company.Name)
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
