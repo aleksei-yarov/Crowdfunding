@@ -198,3 +198,4 @@ C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\n
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\Account\Manage\_ViewImports.cshtml.g.cs
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Bonus\MyBonuses.cshtml.g.cs
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\Account\Manage\Email.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\libman.json

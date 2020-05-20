@@ -33,3 +33,20 @@
     border: 1px solid #ccc;
     border-top: none;
 }
+
+
+.chat {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.chat::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+

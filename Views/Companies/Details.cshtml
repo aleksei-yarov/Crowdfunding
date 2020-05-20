@@ -1,6 +1,7 @@
 ﻿@model Crowdfunding.Models.Company
 
 <link rel="stylesheet" href="~/css/tab.css" />
+<link rel="stylesheet" href="~/css/Comments.css" />
 
 <div>
     <h4>@Html.DisplayFor(model => model.Name)</h4>
@@ -70,12 +71,11 @@
 </div>
 
 <div class="tab">
-    <button class="tablinks" onclick="OpenSection('DescriptionSection')" id="defaultOpen">Description</button>
-    <button class="tablinks" onclick="OpenSection('NewsSection')">News</button>
-    <button class="tablinks" onclick="OpenSection('CommentsSection')">Comments</button>
+    <button class="tablinks" value="DescriptionSection">Description</button>
+    <button class="tablinks" value="NewsSection">News</button>
+    <button class="tablinks" value="CommentsSection" id="defaultTab">Comments</button>
 </div>
 
-<!-- Tab content -->
 <div id="DescriptionSection" class="tabcontent">
     <h3>Desctiption</h3>
     <p>@Model.Description</p>
@@ -86,42 +86,86 @@
     <p>Paris is the capital of France.</p>
 </div>
 
-<div id="CommentsSection" class="tabcontent">
-    <h3>Tokyo</h3>
-    <p>Tokyo is the capital of Japan.</p>
+<div id="CommentsSection" class="tabcontent">    
+    <input type="text" hidden value="@User.Identity.Name" id="userName" />
+    <input type="text" hidden value="@Model.Id" id="companyId" />
+
+    <div class="row">
+        <div class="col-10">
+            <input type="text" class="form-control" id="inputComment" />
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary" id="btnSend">Send</button>
+        </div>
+    </div>
+    <br />
+    <div class="container">
+        <div class="comments">
+            <h3 class="title-comments">Comments</h3>
+            <ul class="media-list" id="commentsBoard">
+            </ul>   
+
+        </div>
+    </div>
 </div>
 
-<ul class="nav nav-pills">
-    <li class="active"><a data-toggle="pill" href="#home">Home</a></li>
-    <li><a data-toggle="pill" href="#menu1">Menu 1</a></li>
-    <li><a data-toggle="pill" href="#menu2">Menu 2</a></li>
-</ul>
 
-<div class="tab-content">
-    <div id="home" class="tab-pane fade in active">
-        <h3>HOME</h3>
-        <p>Some content.</p>
-    </div>
-    <div id="menu1" class="tab-pane fade">
-        <h3>Menu 1</h3>
-        <p>Some content in menu 1.</p>
-    </div>
-    <div id="menu2" class="tab-pane fade">
-        <h3>Menu 2</h3>
-        <p>Some content in menu 2.</p>
-    </div>
-</div>
+
+
 
 @section Scripts {
     <script>
-        document.getElementById("defaultOpen").click();
-        function OpenSection(id) {
-            var allSection = document.querySelectorAll(".tabcontent");
-            for (var elem of allSection) {
-                elem.style.display = "none";
-            }
-            var section = document.getElementById(id);
-            section.style.display = "block";
+        $(".tablinks").on("click", function (event) {
+            $(".tabcontent").hide();
+            $("#" + event.target.getAttribute("value")).fadeIn(1000);
+        })
+        document.getElementById("defaultTab").click();
+    </script>
+
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+
+    <script>
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/companies/index").build();
+
+        hubConnection.on("Send", function (comment, userName, companyId) {
+            if (companyId != $("#companyId").val()) {return}
+            $("<li class='media'>" +
+                "<div class='media-body'>" +
+                "<div class='media-heading'>" +
+                "<div class='author'>" + userName + "</div>" +
+                "<div class='metadata'>" +
+                "<span class='date'>" + GetCurrentTime() + "</span>" +
+                "</div>" +
+                "</div>" +
+                "<div class='media-text text-justify'>" + comment + "</div>" +
+                "<hr>" +
+                "</div>" +
+                "</li>").appendTo($("#commentsBoard"));
+        })
+
+        $("#btnSend").on("click", function () {
+            hubConnection.invoke("Send", $("#inputComment").val(), $("#userName").val(),
+                $("#companyId").val());
+
+        })
+
+        hubConnection.start();
+
+        function GetCurrentTime() {
+            let
+                now = new Date(),
+                date = now.getDate(),
+                month = now.getMonth(),
+                year = now.getFullYear(),
+                hour = now.getHours(),
+                minute = now.getMinutes(),
+                second = now.getSeconds();
+
+            minute = (minute < 10) ? '0' + minute : minute;
+            second = (second < 10) ? '0' + second : second;
+            hour = (hour < 10) ? '0' + hour : hour;
+            return (date + "." + month + "." + year + "  " + hour + ":" + minute + ":" + second);
         }
     </script>
 

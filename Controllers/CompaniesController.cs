@@ -39,15 +39,15 @@ namespace Crowdfunding.Controllers
         }
 
         // GET: Companies/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? companyId)
         {
-            if (id == null)
+            if (companyId == null)
             {
                 return NotFound();
             }             
             var company = await _context.Companies
                 .Include(c => c.CustomUser).Include(x => x.Category).Include(x => x.Bonuses)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == companyId);
             if (company == null)
             {
                 return NotFound();

@@ -6,7 +6,7 @@
 <h1>Admin</h1>
 
 <table class="table" id="table">
-    <tr>        
+    <tr>
         <th>
             <input type="button" class="btn btn-sm btn-primary" value="Block" id="Block" />
             <input type="button" class="btn btn-sm btn-primary" value="Unblock" id="Unblock" />
@@ -15,7 +15,7 @@
             <input type="button" class="btn btn-sm btn-primary" value="Delete" id="Delete" />
         </th>
     </tr>
-    <tr>        
+    <tr>
         <th><input type="checkbox" id="mainCheckbox">Login</th>
         <th>Email</th>
         <th>RegistrDate</th>
@@ -25,7 +25,7 @@
     </tr>
     @foreach (var user in Model)
     {
-        <tr class="User" value=@user.Id>            
+        <tr class="User" value=@user.Id>
             <td> @user.UserName </td>
             <td>@user.Email</td>
             <td>@user.RegistrDate</td>
@@ -49,61 +49,72 @@
     }
 </table>
 
-<script>
-    "use strict";
 
-    let mainCheckbox = document.getElementById("mainCheckbox");
-    mainCheckbox.addEventListener("click", function () {
-        let rows = document.querySelectorAll("tr.User");
-        for (let row of rows) {
-            if (mainCheckbox.checked) {
-                row.classList.add("selectedRow");
+@section Scripts
+{
+    <script>
+        "use strict";
+
+        let mainCheckbox = document.getElementById("mainCheckbox");
+        mainCheckbox.addEventListener("click", function () {
+            let rows = document.querySelectorAll("tr.User");
+            for (let row of rows) {
+                if (mainCheckbox.checked) {
+                    row.classList.add("selectedRow");
+                }
+                else {
+                    row.classList.remove("selectedRow");
+                }
             }
-            else {
-                row.classList.remove("selectedRow");
+        });
+
+        function buttonAction(event) {
+            let selectedUser = document.getElementsByClassName("selectedRow");
+            let url = "/Admin/" + event.target.getAttribute("Id");
+            for (let elem of selectedUser) {
+                url += "/" + elem.getAttribute("value");
             }
+            window.location.href = url;
         }
-    });
 
-    function buttonAction(event) {
-        let selectedUser = document.getElementsByClassName("selectedRow");
-        let url = "/Admin/" + event.target.getAttribute("Id");
-        for (let elem of selectedUser) {
-            url += "/" + elem.getAttribute("value");
-        }
-        window.location.href = url;
-    }
+        let buttonBlock = document.getElementById("Block");
+        buttonBlock.addEventListener("click", buttonAction);
 
-    let buttonBlock = document.getElementById("Block");
-    buttonBlock.addEventListener("click", buttonAction);
+        let buttonUnblock = document.getElementById("Unblock");
+        buttonUnblock.addEventListener("click", buttonAction);
 
-    let buttonUnblock = document.getElementById("Unblock");
-    buttonUnblock.addEventListener("click", buttonAction);
+        let buttonDelete = document.getElementById("Delete");
+        buttonDelete.addEventListener("click", buttonAction);
 
-    let buttonDelete = document.getElementById("Delete");
-    buttonDelete.addEventListener("click", buttonAction);
+        let buttonAdmin = document.getElementById("SetAdmin");
+        buttonAdmin.addEventListener("click", buttonAction);
 
-    let buttonAdmin = document.getElementById("SetAdmin");
-    buttonAdmin.addEventListener("click", buttonAction);
+        let buttonRemoveAdmin = document.getElementById("RemoveAdmin");
+        buttonRemoveAdmin.addEventListener("click", buttonAction);
 
-    let buttonRemoveAdmin = document.getElementById("RemoveAdmin");
-    buttonRemoveAdmin.addEventListener("click", buttonAction);
+        //let table = document.getElementById("table");
+        //table.addEventListener("click", function (event) {
+        //    let target = event.target;
+        //    if (target.tagName != 'TD') return;
+        //    selectRow(target.parentElement);
+        //});
 
-    let table = document.getElementById("table");
-    table.addEventListener("click", function (event) {        
-        let target = event.target;
-        if (target.tagName != 'TD') return;
-        selectRow(target.parentElement);
-    });
+        $("#table td").on("click", function () {
+            $(this).parent().toggleClass("selectedRow");
+        })
 
-    function selectRow(row){
-        if (row.classList.contains("selectedRow")) {
-            row.classList.remove("selectedRow");
-        }
-        else {
-            row.classList.add("selectedRow");
-        }
-    };
-    
-    
-</script>
+        //function selectRow(row) {
+        //    if (row.classList.contains("selectedRow")) {
+        //        row.classList.remove("selectedRow");
+        //    }
+        //    else {
+        //        row.classList.add("selectedRow");
+        //    }
+        //};
+
+
+    </script>
+}
+
+
+
