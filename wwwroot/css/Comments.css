@@ -22,6 +22,8 @@ html {
 .media-text {
     margin-top: 0.5rem;
     margin-bottom: 0.25rem;
+    word-break: break-all;
+    white-space: pre-line;
 }
 
 .title-comments {
@@ -36,4 +38,11 @@ html {
 
 .media-left img {
     width: 50px;
+}
+
+#divInput{
+    margin-top: 1rem;
+}
+textarea {
+    white-space: pre-line;
 }

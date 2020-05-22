@@ -166,13 +166,21 @@ namespace Crowdfunding.Controllers
         
         public async Task<IActionResult> Payment(int? bonusId)
         {            
-            var bonus = await _context.Bonuses.FirstOrDefaultAsync(x => x.Id == bonusId);
+            var bonus = await _context.Bonuses.Include(x => x.CustomUserBonus).FirstOrDefaultAsync(x => x.Id == bonusId);
             var company = await _context.Companies.FirstOrDefaultAsync(x => x.Id == bonus.CompanyId);
-            if (bonus == null)
+            if (bonus == null || company==null)
             {
                 return NotFound();
             }
-            bonus.CustomUserBonus.Add(new CustomUserBonus { BonusId = bonus.Id, CustomUserId = _userManager.GetUserId(User) });
+            var userBonus = bonus.CustomUserBonus.FirstOrDefault(x => x.BonusId == bonus.Id && x.CustomUserId == _userManager.GetUserId(User));
+            if (userBonus == null)
+            {
+                bonus.CustomUserBonus.Add(new CustomUserBonus { BonusId = bonus.Id, CustomUserId = _userManager.GetUserId(User), Count = 1 });
+            }
+            else
+            {
+                userBonus.Count += 1;
+            }
             company.CurrentMoney += bonus.Price;
             _context.Update(company);
             await _context.SaveChangesAsync();

@@ -32,6 +32,8 @@ namespace Crowdfunding.Models
             CompanyTags = new List<CompanyTag>();
         } 
         public List<Bonus> Bonuses { get; set; }
+        public List<Comment> Comments { get; set; }
+        public List<Image> Images { get; set; }
 
     }
 }

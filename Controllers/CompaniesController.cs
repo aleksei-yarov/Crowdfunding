@@ -9,6 +9,9 @@ using Crowdfunding.Data;
 using Crowdfunding.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace Crowdfunding.Controllers
 {
@@ -16,11 +19,14 @@ namespace Crowdfunding.Controllers
     {
         private readonly ApplicationDbContext _context;
         public UserManager<CustomUser> _userManager { get; }
+        public IWebHostEnvironment _appEnvironment { get; }
 
-        public CompaniesController(ApplicationDbContext context, UserManager<CustomUser> manager)
+        public CompaniesController(ApplicationDbContext context, UserManager<CustomUser> manager,
+            IWebHostEnvironment appEnvironment)
         {
             _context = context;
             _userManager = manager;
+            _appEnvironment = appEnvironment;
         }
 
         // GET: Companies
@@ -39,15 +45,16 @@ namespace Crowdfunding.Controllers
         }
 
         // GET: Companies/Details/5
-        public async Task<IActionResult> Details(int? companyId)
+        public async Task<IActionResult> Details(int? id)
         {
-            if (companyId == null)
+            if (id == null)
             {
                 return NotFound();
             }             
             var company = await _context.Companies
                 .Include(c => c.CustomUser).Include(x => x.Category).Include(x => x.Bonuses)
-                .FirstOrDefaultAsync(m => m.Id == companyId);
+                .Include(x => x.Comments).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
+                .Include(x => x.Images).FirstOrDefaultAsync(m => m.Id == id);
             if (company == null)
             {
                 return NotFound();
@@ -60,7 +67,9 @@ namespace Crowdfunding.Controllers
             {
                 ViewBag.Youtube = "https://www.youtube.com/embed/gsqsulWrhfQ";
             }
-                       
+            var temp = company.Comments;
+            temp.Reverse();
+            ViewBag.Comments = temp;          
             return View(company);
         }
 
@@ -78,7 +87,7 @@ namespace Crowdfunding.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Company company, List<string> Tags)
+        public async Task<IActionResult> Create(Company company, List<string> Tags, string Images)
         {          
             var temp = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Name == company.Name);
             if (temp != null)
@@ -88,9 +97,10 @@ namespace Crowdfunding.Controllers
             if (ModelState.IsValid)
             {
                 SaveTags(Tags);
-                AddTagsToCompany(Tags, company);
+                AddTagsToCompany(Tags, company);                
                 _context.Add(company);
                 await _context.SaveChangesAsync();
+                SaveImages(Images, company.Name);
                 return RedirectToAction("Index");
             }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName");
@@ -213,11 +223,12 @@ namespace Crowdfunding.Controllers
 
         private void AddTagsToCompany(List<string> TagList, Company company)
         {
+            TagList = TagList.Distinct().ToList();
             foreach(var elem in TagList)
             {     
                 if (elem != null)
                 {
-                    var tempId = _context.Tags.AsNoTracking().FirstOrDefault(x => x.Name == elem).Id;
+                    var tempId = _context.Tags.AsNoTracking().FirstOrDefault(x => x.Name == elem).Id;  
                     company.CompanyTags.Add(new CompanyTag{CompanyId = company.Id, TagId = tempId});
                     _context.SaveChanges();
                 }
@@ -265,6 +276,41 @@ namespace Crowdfunding.Controllers
             }
             return Tags;
         }
+
+        private void SaveImages(string Images, string companyName)
+        {
+            if (Images != null && companyName != null)
+            {
+                var companyId = _context.Companies.FirstOrDefault(x => x.Name == companyName).Id;
+                if (companyId != 0)
+                {
+                    var image = new Image { Link = Images, CompanyId = companyId };
+                    _context.Add(image);
+                    _context.SaveChanges();
+                }
+            }
+           
+        }
+
+        //private void SaveImages(IFormFile Images, string companyName)
+        //{
+        //    if (Images != null)
+        //    {
+        //        string path = "/Files/" + Images.FileName;
+        //        using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+        //        {
+        //             Images.CopyTo(fileStream);
+        //        }
+        //        var companyId = _context.Companies.FirstOrDefault(x => x.Name == companyName).Id;
+        //        if (companyId != 0)
+        //        {
+        //            var image = new Image { Name = Images.FileName, Link = path, CompanyId = companyId};
+        //            _context.Images.Add(image);
+        //            _context.SaveChanges();
+        //        }
+
+        //    }
+        //} 
 
         [Produces("application/json")]
         [HttpGet("search")]

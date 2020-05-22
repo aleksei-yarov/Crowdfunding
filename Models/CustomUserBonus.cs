@@ -12,6 +12,7 @@ namespace Crowdfunding.Models
         public CustomUser CustomUser { get; set; }
         public int? BonusId { get; set; }
         public Bonus Bonus { get; set; }
+        public int Count { get; set; }
 
     }
 }

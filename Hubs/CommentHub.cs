@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Crowdfunding.Data;
+using Crowdfunding.Models;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +10,18 @@ namespace Crowdfunding.Hubs
 {
     public class CommentHub: Hub
     {
-        public async Task Send(string comment, string userName, string companyId)
+        private readonly ApplicationDbContext _context;
+        public CommentHub(ApplicationDbContext context)
         {
-            await this.Clients.All.SendAsync("Send", comment, userName, companyId);
+            _context = context;
+        }
+        public async Task Send(string message, string userName, string companyId, string dateTime)
+        {
+            Comment newComment = new Comment { CompanyId = int.Parse(companyId), 
+                Message = message, UserName = userName, Date=dateTime};
+            await _context.AddAsync(newComment);
+            await _context.SaveChangesAsync();
+            await this.Clients.All.SendAsync("Send", message, userName, companyId, dateTime);
         }
     }
 }
