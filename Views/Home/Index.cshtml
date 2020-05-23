@@ -2,9 +2,29 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center" id="chat">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>    
-</div>
+    <div class="text-center" id="chat">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <button></button>
+        <input type="file" class="form-control" multiple />
+    </div>
 
 
+@section Scripts{ 
+<script>
+    $("input[type=file]").on("change", function (event) {
+        
+        console.log($(this));
+        console.log($(this).get(0).files);
+
+        console.log(this.files);
+        
+        console.log(event.target.files);
+
+        
+        
+        
+    })
+</script>
+}

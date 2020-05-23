@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Crowdfunding.Controllers
 {
@@ -90,6 +91,7 @@ namespace Crowdfunding.Controllers
         public async Task<IActionResult> Create(Company company, List<string> Tags, string Images)
         {          
             var temp = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Name == company.Name);
+            ChekImages(Images, ModelState);
             if (temp != null)
             {
                 ModelState.AddModelError(nameof(company.Name), "A company with the same name already exists.");
@@ -107,7 +109,7 @@ namespace Crowdfunding.Controllers
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             ViewBag.UserId = _userManager.GetUserId(User);
             return View(company);
-        }
+        }        
 
         // GET: Companies/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -281,36 +283,28 @@ namespace Crowdfunding.Controllers
         {
             if (Images != null && companyName != null)
             {
+                var imagesLink = Images.Split(".....");
+                imagesLink = imagesLink.Where(val => !string.IsNullOrEmpty(val)).ToArray();
                 var companyId = _context.Companies.FirstOrDefault(x => x.Name == companyName).Id;
                 if (companyId != 0)
                 {
-                    var image = new Image { Link = Images, CompanyId = companyId };
-                    _context.Add(image);
+                    foreach(var link in imagesLink)
+                    {
+                        var image = new Image { Link = link, CompanyId = companyId };
+                        _context.Add(image);
+                    }                    
                     _context.SaveChanges();
                 }
-            }
-           
+            }           
         }
 
-        //private void SaveImages(IFormFile Images, string companyName)
-        //{
-        //    if (Images != null)
-        //    {
-        //        string path = "/Files/" + Images.FileName;
-        //        using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
-        //        {
-        //             Images.CopyTo(fileStream);
-        //        }
-        //        var companyId = _context.Companies.FirstOrDefault(x => x.Name == companyName).Id;
-        //        if (companyId != 0)
-        //        {
-        //            var image = new Image { Name = Images.FileName, Link = path, CompanyId = companyId};
-        //            _context.Images.Add(image);
-        //            _context.SaveChanges();
-        //        }
-
-        //    }
-        //} 
+        private void ChekImages(string images, ModelStateDictionary modelState)
+        {
+            if (images == null || images.Split(".....").Length>6)
+            {
+                modelState.AddModelError("name", "You must upload from one to five images");                
+            }  
+        }
 
         [Produces("application/json")]
         [HttpGet("search")]
