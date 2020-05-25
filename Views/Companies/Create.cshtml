@@ -13,7 +13,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -33,7 +33,7 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Images</label>
-                <input type="file" class="form-control" multiple accept="image/*" name="file" />                
+                <input type="file" class="form-control" multiple accept="image/*" name="file" />
                 <input type="text" hidden name="Images" id="img_links" />
             </div>
             <div class="form-group">
@@ -85,19 +85,19 @@
         });
     </script>
 
-    
+
     <script>
         $('document').ready(function () {
             $('input[type=file]').on('change', function () {
                 $("#img_links").attr("value", "");
-                let files = this.files;                
-                for (let i = 0; i < files.length; i++) {       
-                    
+                let files = this.files;
+                for (let i = 0; i < files.length; i++) {
+
                     //if (files[0].size > $(this).data('max-size') * 1024) {
                     //    console.log('Please select a smaller file');
                     //    return false;
                     //}
-                    
+
                     let apiUrl = 'https://api.imgur.com/3/image';
                     let apiKey = 'ae017251e90970a';
 
@@ -118,13 +118,66 @@
                     let formData = new FormData();
                     formData.append('image', files[i]);
                     settings.data = formData;
-                    
+
                     $.ajax(settings).done(function (response) {
-                        temp = $("#img_links").attr("value");                        
-                        $("#img_links").attr("value", temp + "....."+ (JSON.parse(response)).data.link);
-                    });                    
+                        temp = $("#img_links").attr("value");
+                        $("#img_links").attr("value", temp + "....." + (JSON.parse(response)).data.link);
+                    });
                 }
             });
+        });
+    </script>
+
+    <script src="~/lib/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('Description', {
+            extraPlugins: 'easyimage',     
+            language: 'en',
+            removePlugins: 'image, sourcearea',
+            removeDialogTabs: 'link:advanced',
+            height: 630,
+            width: 600,
+            cloudServices_uploadUrl: 'https://33333.cke-cs.com/easyimage/upload/',
+            // Note: this is a token endpoint to be used for CKEditor 4 samples only. Images uploaded using this token may be deleted automatically at any moment.
+            // To create your own token URL please visit https://ckeditor.com/ckeditor-cloud-services/.
+            cloudServices_tokenUrl: 'https://33333.cke-cs.com/token/dev/ijrDsqFix838Gh3wGO3F77FSW94BwcLXprJ4APSp3XQ26xsUHTi0jcb1hoBt',
+            easyimage_styles: {
+                gradient1: {
+                    group: 'easyimage-gradients',
+                    attributes: {
+                        'class': 'easyimage-gradient-1'
+                    },
+                    label: 'Blue Gradient',
+                    icon: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/gradient1.png',
+                    iconHiDpi: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/hidpi/gradient1.png'
+                },
+                gradient2: {
+                    group: 'easyimage-gradients',
+                    attributes: {
+                        'class': 'easyimage-gradient-2'
+                    },
+                    label: 'Pink Gradient',
+                    icon: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/gradient2.png',
+                    iconHiDpi: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/hidpi/gradient2.png'
+                },
+                noGradient: {
+                    group: 'easyimage-gradients',
+                    attributes: {
+                        'class': 'easyimage-no-gradient'
+                    },
+                    label: 'No Gradient',
+                    icon: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/nogradient.png',
+                    iconHiDpi: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/hidpi/nogradient.png'
+                }
+            },
+            easyimage_toolbar: [
+                'EasyImageFull',
+                'EasyImageSide',
+                'EasyImageGradient1',
+                'EasyImageGradient2',
+                'EasyImageNoGradient',
+                'EasyImageAlt'
+            ]
         });
     </script>
 }

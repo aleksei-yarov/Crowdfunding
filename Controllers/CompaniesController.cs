@@ -41,7 +41,8 @@ namespace Crowdfunding.Controllers
 
         public async Task<IActionResult> AllCompanies()
         {            
-           var allCompany = _context.Companies.Include(c => c.CustomUser).Include(x => x.Category);
+           var allCompany = _context.Companies.Include(c => c.CustomUser).Include(x => x.Category)
+                .Include(x => x.CompanyTags).ThenInclude(x => x.Tag);
            return View(await allCompany.ToListAsync()); 
         }
 
@@ -59,15 +60,7 @@ namespace Crowdfunding.Controllers
             if (company == null)
             {
                 return NotFound();
-            }
-            if (company.YoutubeSrc != null)
-            {
-                ViewBag.Youtube = company.YoutubeSrc.Replace("watch?v=", "embed/");
-            }
-            else
-            {
-                ViewBag.Youtube = "https://www.youtube.com/embed/gsqsulWrhfQ";
-            }
+            }            
             var temp = company.Comments;
             temp.Reverse();
             ViewBag.Comments = temp;          
@@ -82,27 +75,25 @@ namespace Crowdfunding.Controllers
             ViewBag.UserId = _userManager.GetUserId(User);
             return View();
         }
-
-        // POST: Companies/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Company company, List<string> Tags, string Images)
+        public async Task<IActionResult> Create(Company company, List<string> Tags, string images)
         {          
             var temp = await _context.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Name == company.Name);
-            ChekImages(Images, ModelState);
+            ChekImages(images, ModelState);
             if (temp != null)
             {
                 ModelState.AddModelError(nameof(company.Name), "A company with the same name already exists.");
             }
             if (ModelState.IsValid)
             {
+                company.YoutubeSrc = company.YoutubeSrc.Replace("watch?v=", "embed/");
                 SaveTags(Tags);
                 AddTagsToCompany(Tags, company);                
                 _context.Add(company);
                 await _context.SaveChangesAsync();
-                SaveImages(Images, company.Name);
+                SaveImages(images, company.Name);
                 return RedirectToAction("Index");
             }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName");
@@ -129,26 +120,24 @@ namespace Crowdfunding.Controllers
                 return View(nameof(NoPermission));
             }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName", company.CustomUserId);
+            company.YoutubeSrc = company.YoutubeSrc.Replace("embed/", "watch?v=");
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             ViewBag.UserId = (await _userManager.GetUserAsync(User)).Id;
             ViewBag.Tags = GetTags(company);
             return View(company);
         }
-
-        // POST: Companies/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+                
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Company company, List<string> Tags)
+        public async Task<IActionResult> Edit(int id, Company company, List<string> Tags, string images)
         {
             if (id != company.Id)
             {
                 return NotFound();
             }
-
             var temp = await _context.Companies.AsNoTracking().Include(x => x.CompanyTags)
                 .FirstOrDefaultAsync(x => x.Name == company.Name);
+            ChekImages(images, ModelState);
             if (temp != null && temp.Id != company.Id)
             {
                 ModelState.AddModelError(nameof(company.Name), "A company with the same name already exists.");
@@ -156,37 +145,25 @@ namespace Crowdfunding.Controllers
             
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(company);
-                    await _context.SaveChangesAsync();
-                    ChangeTag(Tags, id);                    
-                    
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CompanyExists(company.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {    
-                        throw;
-                    }
-                }
+                company.YoutubeSrc = company.YoutubeSrc.Replace("watch?v=", "embed/");
+                _context.Update(company);
+                await _context.SaveChangesAsync();
+                ChangeTag(Tags, id);
+                SaveImages(images, company.Name);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName", company.CustomUserId);
+            company.YoutubeSrc = company.YoutubeSrc.Replace("embed/", "watch?v=");
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", company.CategoryId);
             ViewBag.UserId = (await _userManager.GetUserAsync(User)).Id;
+            ViewBag.Tags = GetTags(company);
             return View(company);
         }
-
-        // GET: Companies/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             var company = await _context.Companies.Include(x => x.CustomUser).Include(x => x.Bonuses)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .Include(x =>x.Images).Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id == id);
             if (company == null)
             {
                 return NotFound();
@@ -321,5 +298,13 @@ namespace Crowdfunding.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpPost]
+        public void PublicationNews([FromBody] string news)
+        {
+            Debug.WriteLine(news);
+        }
+
+        
     }
 }

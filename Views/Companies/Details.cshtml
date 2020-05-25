@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="~/css/tab.css" />
 <link rel="stylesheet" href="~/css/Comments.css" />
 <link rel="stylesheet" href="~/css/gallery.css" />
+<link rel="stylesheet" href="~/lib/ckeditor/plugins/easyimage/styles/easyimage.css" />
 
 <div>
     <h4>@Html.DisplayFor(model => model.Name)</h4>
@@ -12,7 +13,7 @@
 
             <div class="slideshow-container">
                 <div class="mySlides">
-                    <iframe width="560" height="315" src="@ViewBag.Youtube?enablejsapi=1&" frameborder="0" allow="accelerometer; 
+                    <iframe width="560" height="315" src="@Model.YoutubeSrc?enablejsapi=1&" frameborder="0" allow="accelerometer;
                             autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen id="youtube">
                     </iframe>
                 </div>
@@ -35,7 +36,7 @@
             <div style="text-align:center">
                 @for (var i = 0; i < Model.Images.Count + 1; i++)
                 {
-                    <span class="dot" id = "dot_@i"></span>
+                    <span class="dot" id="dot_@i"></span>
                 }
             </div>
 
@@ -50,19 +51,19 @@
                     @Html.DisplayFor(model => model.Category.Name)
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-4">
-                        Tags:
+                    Tags:
                 </div>
                 <div class="col-8">
-                    @foreach(var tag in Model.CompanyTags)
+                    @foreach (var tag in Model.CompanyTags)
                     {
-                       <span> @tag.Tag.Name </span>    
+                        <span> @tag.Tag.Name </span>
                     }
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-4">
                     @Html.DisplayNameFor(model => model.CurrentMoney)
@@ -119,22 +120,28 @@
 </div>
 
 <div id="DescriptionSection" class="tabcontent">
-    <h3>Desctiption</h3>
-    <p>@Model.Description</p>
+    <div class="container">
+        @Html.Raw(Model.Description)
+    </div>
 </div>
 
 <div id="NewsSection" class="tabcontent">
-    <h3>Paris</h3>
-    <p>Paris is the capital of France.</p>
+    <div class="container">
+        @if (User.Identity.Name == Model.CustomUser.UserName || User.IsInRole("Admin"))
+        {
+            <textarea id="newsText"></textarea>
+            <button id="newsBtn">Publish</button>
+        }
+    </div>
 </div>
 
-<div id="CommentsSection" class="tabcontent">    
+<div id="CommentsSection" class="tabcontent">
     <input type="text" hidden value="@User.Identity.Name" id="userName" />
     <input type="text" hidden value="@Model.Id" id="companyId" />
 
-    <div class="row" id="divInput" >        
+    <div class="row" id="divInput">
         <div class="col-10">
-            <textarea class="form-control" id="inputComment" placeholder="Leave a comment" ></textarea>
+            <textarea class="form-control" id="inputComment" placeholder="Leave a comment"></textarea>
         </div>
         <div class="col-2">
             <button class="btn btn-primary" id="btnSend">Send</button>
@@ -155,7 +162,7 @@
                                     <span class="date">@comment.Date</span>
                                 </div>
                             </div>
-                            <div class="media-text text-justify" >@comment.Message</div>
+                            <div class="media-text text-justify">@comment.Message</div>
                             <hr>
                         </div>
                     </li>
@@ -180,16 +187,17 @@
     </script>
 
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/lib/ckeditor/ckeditor.js"></script>
 
     <script>
         //Comments
-        
+
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/companies/index").build();
 
         hubConnection.on("Send", function (message, userName, companyId, dateTime) {
             if (companyId != $("#companyId").val()) { return }
-            CreateComment(message, userName, dateTime);            
+            CreateComment(message, userName, dateTime);
         })
 
         $("#btnSend").on("click", function () {
@@ -229,10 +237,80 @@
                 "<hr>" +
                 "</div>" +
                 "</li>").prependTo($("#commentsBoard")).hide().fadeIn(1000);
-        }
+        }        
     </script>
 
-    <script>     
+    <script>
+        //CKeditor
+
+        CKEDITOR.replace('newsText', {
+            extraPlugins: 'easyimage',
+            language: 'en',
+            removePlugins: 'image, sourcearea',
+            removeDialogTabs: 'link:advanced',
+            height: 600,
+            width: 1000,
+            cloudServices_uploadUrl: 'https://33333.cke-cs.com/easyimage/upload/',
+            // Note: this is a token endpoint to be used for CKEditor 4 samples only. Images uploaded using this token may be deleted automatically at any moment.
+            // To create your own token URL please visit https://ckeditor.com/ckeditor-cloud-services/.
+            cloudServices_tokenUrl: 'https://33333.cke-cs.com/token/dev/ijrDsqFix838Gh3wGO3F77FSW94BwcLXprJ4APSp3XQ26xsUHTi0jcb1hoBt',
+            easyimage_styles: {
+                gradient1: {
+                    group: 'easyimage-gradients',
+                    attributes: {
+                        'class': 'easyimage-gradient-1'
+                    },
+                    label: 'Blue Gradient',
+                    icon: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/gradient1.png',
+                    iconHiDpi: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/hidpi/gradient1.png'
+                },
+                gradient2: {
+                    group: 'easyimage-gradients',
+                    attributes: {
+                        'class': 'easyimage-gradient-2'
+                    },
+                    label: 'Pink Gradient',
+                    icon: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/gradient2.png',
+                    iconHiDpi: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/hidpi/gradient2.png'
+                },
+                noGradient: {
+                    group: 'easyimage-gradients',
+                    attributes: {
+                        'class': 'easyimage-no-gradient'
+                    },
+                    label: 'No Gradient',
+                    icon: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/nogradient.png',
+                    iconHiDpi: 'https://ckeditor.com/docs/ckeditor4/4.14.0/examples/assets/easyimage/icons/hidpi/nogradient.png'
+                }
+            },
+            easyimage_toolbar: [
+                'EasyImageFull',
+                'EasyImageSide',
+                'EasyImageGradient1',
+                'EasyImageGradient2',
+                'EasyImageNoGradient',
+                'EasyImageAlt'
+            ]
+        });
+    </script>
+
+    <script>
+        $("#newsBtn").on("click", function () {
+            let news = CKEDITOR.instances.newsText.getData();
+            console.log(news);
+            $.ajax({
+                type: "POST",
+                url: "/Companies/PublicationNews",
+                data: JSON.stringify(news),
+                contentType: "application/json",
+                dataType: "json"                
+            });
+        });
+
+        
+    </script>
+
+    <script>
         //gallery
         $(document).ready(function () {
             let activeSlide = 0;
@@ -252,15 +330,15 @@
                 }
                 if (activeSlide < 0) {
                     activeSlide = $(".mySlides").length - 1;
-                }                
-                showSlide(activeSlide);                
+                }
+                showSlide(activeSlide);
             })
             $(".dot").on("click", function () {
                 $(".activeSlide:first").hide().removeClass("activeSlide");
                 activeSlide = Number($(this).attr("id").split("_")[1]);
-                showSlide(activeSlide);                               
-            })        
+                showSlide(activeSlide);
+            })
         })
-       
+
     </script>
 }

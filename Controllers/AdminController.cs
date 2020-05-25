@@ -121,10 +121,8 @@ namespace Crowdfunding.Controllers
                     await _userManager.RemoveFromRoleAsync(userAdmin, "admin");
                 }
             }
-
-           
-
             return RedirectToAction("Index");
         }
+               
     }
 }
