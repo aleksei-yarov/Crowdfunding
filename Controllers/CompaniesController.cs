@@ -56,7 +56,7 @@ namespace Crowdfunding.Controllers
             var company = await _context.Companies
                 .Include(c => c.CustomUser).Include(x => x.Category).Include(x => x.Bonuses)
                 .Include(x => x.Comments).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
-                .Include(x => x.Images).FirstOrDefaultAsync(m => m.Id == id);
+                .Include(x => x.News).Include(x => x.Images).FirstOrDefaultAsync(m => m.Id == id);
             if (company == null)
             {
                 return NotFound();
@@ -300,11 +300,33 @@ namespace Crowdfunding.Controllers
         }
 
         [HttpPost]
-        public void PublicationNews([FromBody] string news)
+        public JsonResult PublicationNews([FromBody] News news)
         {
-            Debug.WriteLine(news);
+            _context.Add(news);
+            _context.SaveChanges();
+            return Json(new { newsId = news.Id });
         }
 
-        
+        [HttpPost]
+        public void UpdateNews([FromBody] News news)
+        {
+            _context.Update(news);
+            _context.SaveChanges();            
+        }
+
+        [HttpPost]
+        public void DeleteNews([FromBody] string newsId)
+        {
+            int number;
+            bool isParsable = Int32.TryParse(newsId, out number);
+            if (isParsable)
+            {
+                var news = _context.News.FirstOrDefault(x => x.Id == number);
+                _context.Remove(news);
+                _context.SaveChanges();
+            }
+            
+        }
+
     }
 }

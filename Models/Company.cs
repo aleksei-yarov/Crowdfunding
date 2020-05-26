@@ -34,6 +34,7 @@ namespace Crowdfunding.Models
         public List<Bonus> Bonuses { get; set; }
         public List<Comment> Comments { get; set; }
         public List<Image> Images { get; set; }
+        public List<News> News { get; set; }
 
     }
 }

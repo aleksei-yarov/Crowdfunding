@@ -15,6 +15,7 @@ namespace Crowdfunding.Data
         public DbSet<Bonus> Bonuses { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<News> News { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
