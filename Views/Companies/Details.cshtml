@@ -4,7 +4,10 @@
 <link rel="stylesheet" href="~/css/Comments.css" />
 <link rel="stylesheet" href="~/css/gallery.css" />
 <link rel="stylesheet" href="~/lib/ckeditor/plugins/easyimage/styles/easyimage.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+
+<input type="hidden" value="@User.Identity.Name" id="currentUser" />
 <div>
     <h4>@Html.DisplayFor(model => model.Name)</h4>
     <hr />
@@ -22,7 +25,7 @@
                 {
                     <!-- Full-width images with number and caption text -->
                     <div class="mySlides">
-                        <img src=@img.Link style="width:100%">
+                        <img src=@img.Link style="max-width: 560px; height: 315px;">
                     </div>
                 }
 
@@ -49,6 +52,27 @@
                 </div>
                 <div class="col-8">
                     @Html.DisplayFor(model => model.Category.Name)
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    Rating:
+                </div>
+                <div class="col-8">
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        if (i  < ViewBag.UserRating)
+                        {
+                            <span class="fa fa-star starCheck" data-val=@i></span>
+                        }
+                        else
+                        {
+                            <span class="fa fa-star" data-val=@i></span>
+                        }
+
+                    }
+                    <span class="badge badge-warning" id="companyRating">@ViewBag.AverageRating</span>
                 </div>
             </div>
 
@@ -129,7 +153,7 @@
     @if (User.Identity.Name == Model.CustomUser.UserName || User.IsInRole("Admin"))
     {        
         <button class="btn btn-sm btn-primary" id="createNews">Create News</button>          
-        <div class="container mySlides" id="divNews">
+        <div class="container hiddenNews" id="divNews">
             <textarea id="newsText"></textarea>
             <button class="btn btn-sm btn-primary" id="newsBtn">Publish</button>
         </div>
@@ -263,99 +287,103 @@
 
     <script>
         //News
+        $(document).ready(function () {
+            
+            let editor_config = {
+                extraPlugins: 'easyimage',
+                language: 'en',
+                removePlugins: 'image, sourcearea',
+                removeDialogTabs: 'link:advanced',
+                height: 600,
+                width: 1000,
+                cloudServices_uploadUrl: 'https://33333.cke-cs.com/easyimage/upload/',
+                // Note: this is a token endpoint to be used for CKEditor 4 samples only. Images uploaded using this token may be deleted automatically at any moment.
+                // To create your own token URL please visit https://ckeditor.com/ckeditor-cloud-services/.
+                cloudServices_tokenUrl: 'https://33333.cke-cs.com/token/dev/ijrDsqFix838Gh3wGO3F77FSW94BwcLXprJ4APSp3XQ26xsUHTi0jcb1hoBt',
+                easyimage_toolbar: [
+                    'EasyImageFull',
+                    'EasyImageAlt'
+                ]
+            };
+            if ($("#newsText").length) {
+                CKEDITOR.replace('newsText', editor_config);
+            }            
 
-        let editor_config = {
-            extraPlugins: 'easyimage',
-            language: 'en',
-            removePlugins: 'image, sourcearea',
-            removeDialogTabs: 'link:advanced',
-            height: 600,
-            width: 1000,
-            cloudServices_uploadUrl: 'https://33333.cke-cs.com/easyimage/upload/',
-            // Note: this is a token endpoint to be used for CKEditor 4 samples only. Images uploaded using this token may be deleted automatically at any moment.
-            // To create your own token URL please visit https://ckeditor.com/ckeditor-cloud-services/.
-            cloudServices_tokenUrl: 'https://33333.cke-cs.com/token/dev/ijrDsqFix838Gh3wGO3F77FSW94BwcLXprJ4APSp3XQ26xsUHTi0jcb1hoBt',
-            easyimage_toolbar: [
-                'EasyImageFull',
-                'EasyImageAlt'
-            ]
-        };
+            $("#newsBtn").on("click", function () {
+                let news = { "CompanyId": @Model.Id, "Content": CKEDITOR.instances.newsText.getData() };
 
-        CKEDITOR.replace('newsText', editor_config);
-
-        $("#newsBtn").on("click", function () {
-            let news = { "CompanyId": @Model.Id, "Content": CKEDITOR.instances.newsText.getData() };
-
-            $.ajax({
-                type: "POST",
-                url: "/Companies/PublicationNews",
-                data: JSON.stringify(news),
-                contentType: "application/json",
-                dataType: "json",
-                success: function (id) {
-                    $('<div id="' + id.newsId + '">' +
-                        '<button class= "btn btn-sm btn-primary editNews" >Edit</button> ' +
-                        '<button class="btn btn-sm btn-primary deleteNews">Delete</button> <hr/>' +
-                        '<div class="container">' +
-                        CKEDITOR.instances.newsText.getData() +
-                        '</div> <hr class="news"/></div>').insertAfter("#startNews").hide().fadeIn();
-                }
-            });            
-            $("#divNews").toggleClass("mySlides");
-        });
-
-        $("#createNews").on("click", function () {
-            $("#divNews").toggleClass("mySlides");
-        })
-
-        $("body").on("click", ".deleteNews", function () {
-            let isDelete = confirm("Are you sure?");
-            if (isDelete == false) { return }
-            let newsId = $(this).parent().attr("id");
-            $.ajax({
-                type: "POST",
-                url: "/Companies/DeleteNews",
-                data: JSON.stringify(newsId),
-                contentType: "application/json",
-                dataType: "json"
+                $.ajax({
+                    type: "POST",
+                    url: "/Companies/PublicationNews",
+                    data: JSON.stringify(news),
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (id) {
+                        $('<div id="' + id.newsId + '">' +
+                            '<button class= "btn btn-sm btn-primary editNews" >Edit</button> ' +
+                            '<button class="btn btn-sm btn-primary deleteNews">Delete</button> <hr/>' +
+                            '<div class="container">' +
+                            CKEDITOR.instances.newsText.getData() +
+                            '</div> <hr class="news"/></div>').insertAfter("#startNews").hide().fadeIn();
+                    }
+                });
+                $("#divNews").toggleClass("hiddenNews");
             });
-            $(this).parent().remove();
+
+            $("#createNews").on("click", function () {
+                $("#divNews").toggleClass("hiddenNews");
+            })
+
+            $("body").on("click", ".deleteNews", function () {
+                let isDelete = confirm("Are you sure?");
+                if (isDelete == false) { return }
+                let newsId = $(this).parent().attr("id");
+                $.ajax({
+                    type: "POST",
+                    url: "/Companies/DeleteNews",
+                    data: JSON.stringify(newsId),
+                    contentType: "application/json",
+                    dataType: "json"
+                });
+                $(this).parent().remove();
+            })
+
+            $("body").on("click", ".editNews", function () {
+
+                $('<div>' +
+                    '<textarea id="editNewsTextarea' + $(this).parent().attr("id") + '" >' +
+                    $(this).siblings("div").html() +
+                    '</textarea>' +
+                    '<button class="btn btn-sm btn-primary acceptEdit">Accept</button>  ' +
+                    '<button class="btn btn-sm btn-primary cancelEdit">Cancel</button><hr/></div>').insertAfter($(this).parent());
+
+                CKEDITOR.replace('editNewsTextarea' + $(this).parent().attr("id"), editor_config);
+                $(this).parent().hide();
+            })
+
+            $("body").on("click", ".cancelEdit", function () {
+                newsId = $(this).siblings("textarea").attr('id').replace('editNewsTextarea', '');
+                $(this).parent().remove();
+                $("#" + newsId).show();
+            })
+
+            $("body").on("click", ".acceptEdit", function () {
+                let newsId = $(this).siblings("textarea").attr('id').replace('editNewsTextarea', '');
+                let textareaId = $(this).siblings("textarea").attr('id');
+                let news = { "Id": parseInt(newsId), "CompanyId": @Model.Id, "Content": CKEDITOR.instances[textareaId].getData() };
+                $.ajax({
+                    type: 'POST',
+                    url: "/Companies/UpdateNews",
+                    data: JSON.stringify(news),
+                    contentType: "application/json",
+                    dataType: "json"
+                });
+                $("#" + newsId).children('div').html(CKEDITOR.instances[textareaId].getData());
+                $("#" + newsId).show();
+                $("#" + textareaId).parent().remove();
+            })
         })
 
-        $("body").on("click", ".editNews", function () {
-
-            $('<div>' +
-                '<textarea id="editNewsTextarea' + $(this).parent().attr("id") + '" >' +
-                $(this).siblings("div").html() +
-                '</textarea>' +
-                '<button class="btn btn-sm btn-primary acceptEdit">Accept</button>  ' +
-                '<button class="btn btn-sm btn-primary cancelEdit">Cancel</button><hr/></div>').insertAfter($(this).parent());
-
-            CKEDITOR.replace('editNewsTextarea' + $(this).parent().attr("id"), editor_config);
-            $(this).parent().hide();
-        })
-
-        $("body").on("click", ".cancelEdit", function () {
-            newsId = $(this).siblings("textarea").attr('id').replace('editNewsTextarea', '');
-            $(this).parent().remove();
-            $("#" + newsId).show();
-        })
-
-        $("body").on("click", ".acceptEdit", function () {
-            let newsId = $(this).siblings("textarea").attr('id').replace('editNewsTextarea', '');
-            let textareaId = $(this).siblings("textarea").attr('id');
-            let news = { "Id": parseInt(newsId), "CompanyId": @Model.Id, "Content": CKEDITOR.instances[textareaId].getData() };
-            $.ajax({
-                type: 'POST',
-                url: "/Companies/UpdateNews",
-                data: JSON.stringify(news),
-                contentType: "application/json",
-                dataType: "json"
-            });
-            $("#" + newsId).children('div').html(CKEDITOR.instances[textareaId].getData());
-            $("#" + newsId).show();
-            $("#" + textareaId).parent().remove();
-        })
 
 
     </script>
@@ -391,5 +419,39 @@
             })
         })
 
+    </script>
+
+    <script>
+        //rating
+        $(document).ready(function () {            
+            $(".fa-star").on("click", function () {
+                $(this).prevAll().addClass('starCheck');
+                $(this).addClass('starCheck');
+                $(this).nextAll(".starCheck").removeClass("starCheck");
+                let rating = { "CompanyId": @Model.Id, "Value": Number($(this).attr("data-val")) + 1, "UserName": $("#currentUser").val() }
+                console.log(rating);
+                $.ajax({
+                    type: "POST",                    
+                    url: "/Companies/ToRate",
+                    data: JSON.stringify(rating),
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (responce) {
+                        $("#companyRating").text(responce.companyRating)
+                    }
+                });
+            })
+            $('.fa-star').hover(
+                function () {                    
+                    $(this).prevAll().addClass('starHover');
+                    $(this).addClass('starHover');
+                },
+                function () {                    
+                    $(this).prevAll().removeClass('starHover');                    
+                    $(this).removeClass('starHover');                    
+                }
+            )
+
+        })
     </script>
 }

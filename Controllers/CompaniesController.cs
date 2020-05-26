@@ -63,9 +63,13 @@ namespace Crowdfunding.Controllers
             }            
             var temp = company.Comments;
             temp.Reverse();
-            ViewBag.Comments = temp;          
+            ViewBag.Comments = temp;
+            ViewBag.AverageRating = Math.Round(GetRating(company.Id), 2);
+            ViewBag.UserRating = GetUserRating(User.Identity.Name, id);
             return View(company);
         }
+
+        
 
         // GET: Companies/Create
         public IActionResult Create()
@@ -163,6 +167,7 @@ namespace Crowdfunding.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             var company = await _context.Companies.Include(x => x.CustomUser).Include(x => x.Bonuses)
+                .Include(x => x.Ratings)
                 .Include(x =>x.Images).Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id == id);
             if (company == null)
             {
@@ -174,7 +179,7 @@ namespace Crowdfunding.Controllers
             }
             _context.Companies.Remove(company);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(AllCompanies));
         }
         
         public async Task<IActionResult> NoPermission()
@@ -328,5 +333,53 @@ namespace Crowdfunding.Controllers
             
         }
 
+        [HttpPost]
+        public JsonResult ToRate([FromBody] Rating rating)
+        {
+            var temp = _context.Ratings.AsNoTracking()
+                .FirstOrDefault(x => x.CompanyId == rating.CompanyId && x.UserName == rating.UserName);
+            var company = _context.Companies.FirstOrDefault(x => x.Id == rating.CompanyId);
+            if (temp == null)
+            {
+                _context.Add(rating);
+            }
+            else
+            {
+                rating.Id = temp.Id;
+                _context.Update(rating);
+            }
+            company.AverageRating = GetRating(company.Id);            
+            _context.SaveChanges();            
+            return Json(new { companyRating = GetRating(rating.CompanyId) });
+        }
+
+        public double GetRating(int? companyId)
+        {
+            var allRating = _context.Ratings.Where(x => x.CompanyId == companyId).ToList();
+            double average = 0;
+            foreach(var rating in allRating)
+            {
+                average += rating.Value;
+            }
+            if (allRating.Count == 0)
+            {
+                return 0;
+            }   
+            
+            return Math.Round(average / allRating.Count, 2);
+        }
+
+        public double GetUserRating(string name, int? id)
+        {
+            var rating = _context.Ratings.FirstOrDefault(x => x.UserName == name && x.CompanyId == id);
+            if (rating != null)
+            {
+                return rating.Value;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }

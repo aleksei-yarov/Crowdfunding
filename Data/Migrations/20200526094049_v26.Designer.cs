@@ -4,14 +4,16 @@ using Crowdfunding.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crowdfunding.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200526094049_v26")]
+    partial class v26
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,9 +96,6 @@ namespace Crowdfunding.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<double>("AverageRating")
-                        .HasColumnType("float");
 
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
@@ -275,29 +274,6 @@ namespace Crowdfunding.Data.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("News");
-                });
-
-            modelBuilder.Entity("Crowdfunding.Models.Rating", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("Crowdfunding.Models.Tag", b =>
@@ -516,13 +492,6 @@ namespace Crowdfunding.Data.Migrations
                 {
                     b.HasOne("Crowdfunding.Models.Company", "Company")
                         .WithMany("News")
-                        .HasForeignKey("CompanyId");
-                });
-
-            modelBuilder.Entity("Crowdfunding.Models.Rating", b =>
-                {
-                    b.HasOne("Crowdfunding.Models.Company", "Company")
-                        .WithMany("Ratings")
                         .HasForeignKey("CompanyId");
                 });
 

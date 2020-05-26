@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Crowdfunding.Data;
 using Crowdfunding.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,13 +16,18 @@ namespace Crowdfunding.Controllers
     public class AdminController : Controller
     {
         private readonly SignInManager<CustomUser> _signInManager;
+
+        public ApplicationDbContext _context { get; }
+
         private readonly UserManager<CustomUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AdminController(UserManager<CustomUser> manager, RoleManager<IdentityRole> roleManager, SignInManager<CustomUser> signInManager)
+        public AdminController(UserManager<CustomUser> manager, RoleManager<IdentityRole> roleManager, 
+            SignInManager<CustomUser> signInManager, ApplicationDbContext context)
         {
             _userManager = manager;
             _roleManager = roleManager;
             _signInManager = signInManager;
+            _context = context;
             
         }
         [Authorize(Roles ="Admin")]
@@ -75,7 +81,8 @@ namespace Crowdfunding.Controllers
                 var usersToDelete = data.Split("/");
                 foreach (var userId in usersToDelete)
                 {
-                    var userDelete = await _userManager.FindByIdAsync(userId);
+                    var userDelete = await _context.Users.Include(x => x.Companies).Include(x => x.CustomUserBonus)
+                        .FirstOrDefaultAsync(x => x.Id == userId);
                     if (User.Identity.Name == userDelete.UserName)
                     {
                         await _signInManager.SignOutAsync();

@@ -15,7 +15,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" ></textarea>
+                <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -134,5 +134,24 @@
         });
     </script>
 
-    
+    <script src="~/lib/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('Description', {
+            extraPlugins: 'easyimage',
+            language: 'en',
+            removePlugins: 'image, sourcearea',
+            removeDialogTabs: 'link:advanced',
+            height: 630,
+            width: 600,
+            cloudServices_uploadUrl: 'https://33333.cke-cs.com/easyimage/upload/',
+            // Note: this is a token endpoint to be used for CKEditor 4 samples only. Images uploaded using this token may be deleted automatically at any moment.
+            // To create your own token URL please visit https://ckeditor.com/ckeditor-cloud-services/.
+            cloudServices_tokenUrl: 'https://33333.cke-cs.com/token/dev/ijrDsqFix838Gh3wGO3F77FSW94BwcLXprJ4APSp3XQ26xsUHTi0jcb1hoBt',
+            easyimage_toolbar: [
+                'EasyImageFull',
+                'EasyImageAlt'
+            ]
+        });
+    </script>
+
 }

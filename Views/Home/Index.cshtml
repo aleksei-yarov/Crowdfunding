@@ -1,30 +1,70 @@
-﻿@{
+﻿@model Crowdfunding.Controllers.ViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
+<link rel="stylesheet" href="~/css/main_page.css" />
+<div class="text-center">
+    <h1 class="display-3">Welcome</h1>        
+</div>
 
-    <div class="text-center" id="chat">
-        <h1 class="display-4">Welcome</h1>
-        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-        <button></button>
-        <input type="file" class="form-control" multiple />
+<div class="row">
+    <div class="col-md-6">
+        <div class="text-center">
+            <h1 class="display-4"> The newest </h1>
+        </div>
+        @foreach(var comp in Model.topNew)
+        {
+            <div class="container border company" data-request-url="@Url.Action("Details", "Companies", new { id=comp.Id})">
+                <div class="row"  >
+                    <div class="col-md-6">
+                        <img src=@comp.Images.FirstOrDefault().Link style="max-width:250px;height:140px; margin-bottom:1rem; margin-top:1rem;">
+                    </div>
+                    <div class="col-md-6">
+                        <p>@comp.Name</p>
+                        <p>@comp.Category</p>
+                        <p>@comp.CurrentMoney / @comp.TargetMoney</p>
+                        @foreach(var tag in @comp.CompanyTags.ToList())
+                        {
+                            <span> @tag.Tag.Name</span>
+                        }                        
+                    </div>
+                </div>
+            </div>            
+        }
     </div>
+    <div class="col-md-6">
+        <div class="text-center">
+            <h1 class="display-4"> The best </h1>
+        </div>
+        @foreach (var comp in Model.topRate)
+        {
+            <div class="container border company" data-request-url="@Url.Action("Details", "Companies", new { id=comp.Id})">
+                <div class="row">
+                    <div class="col-md-6">
+                        @*<img src=@comp.Images.FirstOrDefault().Link style="max-width:250px;height:140px; margin-bottom:1rem; margin-top:1rem;">*@
+                    </div>
+                    <div class="col-md-6">
+                        <p>@comp.Name</p>
+                        <p>@comp.Category</p>
+                        <p>@comp.CurrentMoney / @comp.TargetMoney</p>
+                        @foreach (var tag in @comp.CompanyTags.ToList())
+                        {
+                            <span> @tag.Tag.Name</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
 
 @section Scripts{ 
+
 <script>
-    $("input[type=file]").on("change", function (event) {
-        
-        console.log($(this));
-        console.log($(this).get(0).files);
-
-        console.log(this.files);
-        
-        console.log(event.target.files);
-
-        
-        
-        
+    $(".company").on("click", function () {
+        window.location.href = $(this).attr("data-request-url");
     })
 </script>
+
 }

@@ -74,6 +74,11 @@
             for (let elem of selectedUser) {
                 url += "/" + elem.getAttribute("value");
             }
+            if (event.target.getAttribute("Id") == "Delete")
+            {
+                let isDelete = confirm("Are you sure?");
+                if (isDelete == false) { return }
+            }
             window.location.href = url;
         }
 
@@ -92,28 +97,17 @@
         let buttonRemoveAdmin = document.getElementById("RemoveAdmin");
         buttonRemoveAdmin.addEventListener("click", buttonAction);
 
-        //let table = document.getElementById("table");
-        //table.addEventListener("click", function (event) {
-        //    let target = event.target;
-        //    if (target.tagName != 'TD') return;
-        //    selectRow(target.parentElement);
-        //});
+       
 
         $("#table td").on("click", function () {
             $(this).parent().toggleClass("selectedRow");
         })
 
-        //function selectRow(row) {
-        //    if (row.classList.contains("selectedRow")) {
-        //        row.classList.remove("selectedRow");
-        //    }
-        //    else {
-        //        row.classList.add("selectedRow");
-        //    }
-        //};
+        
 
 
     </script>
+    
 }
 
 

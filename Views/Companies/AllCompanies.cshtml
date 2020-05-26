@@ -56,10 +56,24 @@
                     @if (User.IsInRole("Admin"))
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">| Edit |</a>              
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="deleteCompany">Delete</a>
                     }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+
+@section Scripts{
+
+    <script>
+        $(".deleteCompany").on("click", function (event) {
+            event.preventDefault();
+            let isDelete = confirm("Are you sure?");
+            if (isDelete == false) { return }
+            window.location.href = $(this).attr("href");
+        })        
+    </script>
+
+ }

@@ -52,3 +52,7 @@
 .news {
     margin-bottom: 7rem;
 }
+
+.hiddenNews{
+    display: none;
+}
