@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfunding.Controllers
 {
-    public class ViewModel
+    public class ModelStartPage
     {
         public List<Company> topNew { get; set; }
         public List<Company> topRate { get; set; }
@@ -33,11 +33,14 @@ namespace Crowdfunding.Controllers
         {
 
             var topNew = _context.Companies.Include(x => x.Images).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
-                .OrderBy(x => x.RegDate).Take(2).ToList();
+                .Include(x => x.Category).OrderBy(x => x.RegDate).Take(15).ToList();
             
             var topRate = _context.Companies.Include(x => x.Images).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
-                .OrderByDescending(x => x.AverageRating).Take(2).ToList();
-            var model = new ViewModel { topNew = topNew, topRate = topRate };
+                .Include(x => x.Category).OrderByDescending(x => x.AverageRating).Take(15).ToList();
+            var model = new ModelStartPage { topNew = topNew, topRate = topRate };
+
+            ViewBag.Tags = GetNotNullTags();
+            
             
             return View(model);
         }
@@ -51,6 +54,23 @@ namespace Crowdfunding.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public List<string> GetNotNullTags()
+        {
+            var temp = _context.Tags.Include(x => x.CompanyTags).ToList();
+            var tags = new List<string>();
+            foreach (var tag in temp)
+            {
+                foreach (var id in tag.CompanyTags)
+                {
+                    if (id.CompanyId != null)
+                    {
+                        tags.Add(tag.Name);
+                    }
+                }
+            }
+            return tags.Distinct().ToList();
         }
         
     }

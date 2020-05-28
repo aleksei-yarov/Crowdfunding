@@ -1,0 +1,12 @@
+﻿@model IEnumerable<Crowdfunding.Models.Company>
+
+<div>
+    <p>Result for "@ViewBag.Search"</p>
+    @foreach(var comp in Model)
+    {
+    <ul>
+        <li><a asp-action="Details" asp-controller="Companies" asp-route-id="@comp.Id">@comp.Name</a></li>
+    </ul>
+       
+    }
+</div>

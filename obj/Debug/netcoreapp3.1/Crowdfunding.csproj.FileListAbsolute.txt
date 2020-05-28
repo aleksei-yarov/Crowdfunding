@@ -1,9 +1,6 @@
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Crowdfunding.Views.pdb
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.Views.pdb
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.csprojAssemblyReference.cache
-C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.csproj.CoreCompileInputs.cache
-C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.RazorAssemblyInfo.cache
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.RazorAssemblyInfo.cs
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.AssemblyInfoInputs.cache
@@ -199,3 +196,20 @@ C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\n
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Bonus\MyBonuses.cshtml.g.cs
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\Account\Manage\Email.cshtml.g.cs
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\libman.json
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Companies\GetViewByTag.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Companies\GetViewByCategory.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Companies\Search.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Properties\serviceDependencies.Crowdfunding20200527214930 - Web Deploy.json
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Properties\serviceDependencies.json
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.csproj.CoreCompileInputs.cache
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Crowdfunding.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Http.Connections.Client.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Microsoft.Azure.SignalR.Common.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Microsoft.Azure.SignalR.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Microsoft.Azure.SignalR.Protocols.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Logging.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\netcoreapp3.1\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Admin\CreateCategory.cshtml.g.cs

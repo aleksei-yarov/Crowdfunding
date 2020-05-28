@@ -105,10 +105,6 @@ namespace Crowdfunding.Controllers
                     await _userManager.AddToRoleAsync(userAdmin, "admin");
                 }
             }
-
-
-            //await _roleManager.CreateAsync(new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" });
-
             return RedirectToAction("Index");
         }
 
@@ -130,6 +126,54 @@ namespace Crowdfunding.Controllers
             }
             return RedirectToAction("Index");
         }
-               
+
+        public async Task<IActionResult> Start()
+        {
+            if (await _roleManager.FindByNameAsync("Admin") == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                if (await _userManager.FindByNameAsync("admin") == null)
+                {
+                    CustomUser admin = new CustomUser { Email = "admin@admin.by", UserName = "admin" };
+                    IdentityResult result = await _userManager.CreateAsync(admin, "admin");
+                    if (result.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(admin, "Admin");
+                    }
+                }
+            }
+            return NoContent();
+        }
+
+
+        public async Task<IActionResult> CreateCategory()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(category);
+                await _context.SaveChangesAsync();
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> GetAdmin()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            await _userManager.AddToRoleAsync(user, "Admin");
+            return NoContent();
+        }
+
+        public async Task<IActionResult> CreateAdmin()
+        {
+            await _roleManager.CreateAsync(new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" });
+            return NoContent();
+        }
+                
     }
 }

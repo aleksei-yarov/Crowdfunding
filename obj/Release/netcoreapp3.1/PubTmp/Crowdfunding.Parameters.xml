@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="IIS Web Application Name" description="" value="Crowdfunding20200527214930" tags="IisApp">
+    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\Галицкая\ Ангелина\\source\\repos\\Crowdfunding\\obj\\Release\\netcoreapp3\.1\\PubTmp\\Out\\$" />
+  </parameter>
+  <parameter name="Crowdfunding.Data.ApplicationDbContext" description="" value="Data Source=tcp:crowdfundingdbserver.database.windows.net,1433;Initial Catalog=Crowdfunding1_db;User Id=admindb@crowdfundingdbserver;Password=1qazXSW@3ed" tags="dbfullsql">
+    <parameterEntry kind="ProviderPath" scope="dbfullsql" match="^C:\\Users\\Галицкая\ Ангелина\\source\\repos\\Crowdfunding\\obj\\Release\\netcoreapp3\.1\\PubTmp\\EFSQLScripts\\Crowdfunding\.Data\.ApplicationDbContext\.sql$" />
+  </parameter>
+</parameters>

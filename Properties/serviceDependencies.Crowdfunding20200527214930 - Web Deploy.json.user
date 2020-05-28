@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "signalr1": {
+      "restored": true,
+      "restoreTime": "2020-05-27T19:00:31.8155054Z"
+    },
+    "mssql1": {
+      "restored": true,
+      "restoreTime": "2020-05-27T18:57:16.9045002Z"
+    }
+  },
+  "parameters": {
+    "resourceGroup": {
+      "Type": "resourceGroup",
+      "Value": "Crowdfunding20200527214930ResourceGroup"
+    },
+    "subscriptionId": {
+      "Type": "subscription",
+      "Value": "5145abd3-5069-4616-a6e3-079c72c849be"
+    }
+  }
+}

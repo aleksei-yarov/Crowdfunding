@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Этот файл используется процессом публикации или упаковки вашего веб-проекта. Можно настроить поведение этого процесса,
+изменив этот файл MSBuild. Подробности см. на странице https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAACvQklod92U+QsChI2DoObgAAAAACAAAAAAADZgAAwAAAABAAAADpbynzQhRZkG8tEpj7FvP+AAAAAASAAACgAAAAEAAAAJoqmBIrj7edK7CaFv9bfaaAAAAA/3P/G3GZ3xuAKy59bXfvF0yFg8M2qo+9nBN1HedYo9muKnBrwRy7AMIJmnhl0uRLOKSRODj+qqhCiuOmpoFEnXEewikKrOP4t93QD9u8ghmP0Bi6TILYmZqtr5Tp7PwHaZOTvewLIF4CxzBrevUpYgv2I6aQGXw0j8IDdPfNR7EUAAAAXGslifmwqyBqfPKgWGoJqhtL+NQ=</EncryptedPassword>
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Data Source=tcp:crowdfundingdbserver.database.windows.net,1433%3bInitial Catalog=Crowdfunding1_db%3bUser Id=admindb%40crowdfundingdbserver%3bPassword=1qazXSW%403ed</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="Crowdfunding.Data.ApplicationDbContext">
+      <Value>Data Source=tcp:crowdfundingdbserver.database.windows.net,1433%3bInitial Catalog=Crowdfunding1_db%3bUser Id=admindb%40crowdfundingdbserver%3bPassword=1qazXSW%403ed</Value>
+    </EFMigrations>
+  </ItemGroup>
+</Project>

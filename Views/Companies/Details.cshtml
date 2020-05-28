@@ -51,7 +51,7 @@
                     @Html.DisplayNameFor(model => model.Category)
                 </div>
                 <div class="col-8">
-                    @Html.DisplayFor(model => model.Category.Name)
+                    <a asp-action="GetViewByCategory" asp-route-categoryName="@Model.Category.Name">@Model.Category.Name</a>
                 </div>
             </div>
 
@@ -60,17 +60,20 @@
                     Rating:
                 </div>
                 <div class="col-8">
-                    @for (var i = 0; i < 5; i++)
+                    @if (User.Identity.IsAuthenticated)
                     {
-                        if (i  < ViewBag.UserRating)
+                        @for (var i = 0; i < 5; i++)
                         {
-                            <span class="fa fa-star starCheck" data-val=@i></span>
-                        }
-                        else
-                        {
-                            <span class="fa fa-star" data-val=@i></span>
-                        }
+                            if (i < ViewBag.UserRating)
+                            {
+                                <span class="fa fa-star starCheck" data-val=@i></span>
+                            }
+                            else
+                            {
+                                <span class="fa fa-star" data-val=@i></span>
+                            }
 
+                        }
                     }
                     <span class="badge badge-warning" id="companyRating">@ViewBag.AverageRating</span>
                 </div>
@@ -151,15 +154,15 @@
 
 <div id="NewsSection" class="tabcontent">
     @if (User.Identity.Name == Model.CustomUser.UserName || User.IsInRole("Admin"))
-    {        
-        <button class="btn btn-sm btn-primary" id="createNews">Create News</button>          
+    {
+        <button class="btn btn-sm btn-primary" id="createNews">Create News</button>
         <div class="container hiddenNews" id="divNews">
             <textarea id="newsText"></textarea>
             <button class="btn btn-sm btn-primary" id="newsBtn">Publish</button>
         </div>
-        <hr id="startNews"/>
-        
-        
+        <hr id="startNews" />
+
+
     }
     @foreach (var news in Model.News)
     {
@@ -167,30 +170,33 @@
             @if (User.Identity.Name == Model.CustomUser.UserName || User.IsInRole("Admin"))
             {
                 <button class="btn btn-sm btn-primary editNews">Edit</button>
-                <button class="btn btn-sm btn-primary deleteNews">Delete</button> 
-                <hr/>
+                <button class="btn btn-sm btn-primary deleteNews">Delete</button>
+                <hr />
             }
             <div class="container ">
                 @Html.Raw(news.Content)
             </div>
             <hr class="news" />
-        </div>        
+        </div>
     }
- </div>
+</div>
 
 <div id="CommentsSection" class="tabcontent">
     <input type="text" hidden value="@User.Identity.Name" id="userName" />
     <input type="text" hidden value="@Model.Id" id="companyId" />
 
-    <div class="row" id="divInput">
-        <div class="col-10">
-            <textarea class="form-control" id="inputComment" placeholder="Leave a comment"></textarea>
-        </div>
-        <div class="col-2">
-            <button class="btn btn-primary" id="btnSend">Send</button>
-        </div>
-    </div>
-    <br />
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="row" id="divInput">
+            <div class="col-10">
+                <textarea class="form-control" id="inputComment" placeholder="Leave a comment"></textarea>
+            </div>
+            <div class="col-2">
+                <button class="btn btn-primary" id="btnSend">Send</button>
+            </div>
+        </div>        
+    }
+
     <div class="container">
         <div class="comments">
             <h3 class="title-comments">Comments</h3>
@@ -280,7 +286,7 @@
                 "<hr>" +
                 "</div>" +
                 "</li>").prependTo($("#commentsBoard")).hide().fadeIn(1000);
-        }        
+        }
     </script>
 
 
@@ -288,7 +294,7 @@
     <script>
         //News
         $(document).ready(function () {
-            
+
             let editor_config = {
                 extraPlugins: 'easyimage',
                 language: 'en',
@@ -307,7 +313,7 @@
             };
             if ($("#newsText").length) {
                 CKEDITOR.replace('newsText', editor_config);
-            }            
+            }
 
             $("#newsBtn").on("click", function () {
                 let news = { "CompanyId": @Model.Id, "Content": CKEDITOR.instances.newsText.getData() };
@@ -423,7 +429,7 @@
 
     <script>
         //rating
-        $(document).ready(function () {            
+        $(document).ready(function () {
             $(".fa-star").on("click", function () {
                 $(this).prevAll().addClass('starCheck');
                 $(this).addClass('starCheck');
@@ -431,8 +437,8 @@
                 let rating = { "CompanyId": @Model.Id, "Value": Number($(this).attr("data-val")) + 1, "UserName": $("#currentUser").val() }
                 console.log(rating);
                 $.ajax({
-                    type: "POST",                    
-                    url: "/Companies/ToRate",
+                    type: "POST",
+                    url: "/Companies/Rate",
                     data: JSON.stringify(rating),
                     contentType: "application/json",
                     dataType: "json",
@@ -442,13 +448,13 @@
                 });
             })
             $('.fa-star').hover(
-                function () {                    
+                function () {
                     $(this).prevAll().addClass('starHover');
                     $(this).addClass('starHover');
                 },
-                function () {                    
-                    $(this).prevAll().removeClass('starHover');                    
-                    $(this).removeClass('starHover');                    
+                function () {
+                    $(this).prevAll().removeClass('starHover');
+                    $(this).removeClass('starHover');
                 }
             )
 

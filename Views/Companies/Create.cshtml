@@ -42,11 +42,11 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Tags</label>
-                <input type="text" class="form-control" name="Tags" data-autocomplete-source="@Url.Action("Search", "Companies")" id="img_input" />
+                <input type="text" class="form-control" name="Tags" data-autocomplete-source="@Url.Action("Autocomplete", "Companies")"  />
             </div>
             <div class="form-group">
                 <label class="control-label">Tags</label>
-                <input type="text" class="form-control" name="Tags" data-autocomplete-source="@Url.Action("Search", "Companies")" />
+                <input type="text" class="form-control" name="Tags" data-autocomplete-source="@Url.Action("Autocomplete", "Companies")" />
             </div>
             @if (User.IsInRole("Admin"))
             {

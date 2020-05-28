@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Crowdfunding.Controllers
 {
@@ -31,6 +32,7 @@ namespace Crowdfunding.Controllers
         }
 
         // GET: Companies
+        [Authorize]
         public async Task<IActionResult> Index()
         {            
             var applicationDbContext = _context.Companies.Include(c => c.CustomUser).Where(x => x.CustomUser.UserName == User.Identity.Name)
@@ -69,9 +71,10 @@ namespace Crowdfunding.Controllers
             return View(company);
         }
 
-        
 
-        // GET: Companies/Create
+
+        
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["CustomUserId"] = new SelectList(_context.Users, "Id", "UserName");
@@ -79,7 +82,8 @@ namespace Crowdfunding.Controllers
             ViewBag.UserId = _userManager.GetUserId(User);
             return View();
         }
-       
+
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Company company, List<string> Tags, string images)
@@ -104,9 +108,9 @@ namespace Crowdfunding.Controllers
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             ViewBag.UserId = _userManager.GetUserId(User);
             return View(company);
-        }        
+        }
 
-        // GET: Companies/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -130,7 +134,8 @@ namespace Crowdfunding.Controllers
             ViewBag.Tags = GetTags(company);
             return View(company);
         }
-                
+
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Company company, List<string> Tags, string images)
@@ -163,7 +168,8 @@ namespace Crowdfunding.Controllers
             ViewBag.Tags = GetTags(company);
             return View(company);
         }
-        
+
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             var company = await _context.Companies.Include(x => x.CustomUser).Include(x => x.Bonuses)
@@ -290,12 +296,12 @@ namespace Crowdfunding.Controllers
 
         [Produces("application/json")]
         [HttpGet("search")]
-        public async Task<IActionResult> Search()
+        public async Task<IActionResult> Autocomplete()
         {
             try
             {
                 string term = HttpContext.Request.Query["term"].ToString();
-                var names = _context.Tags.Where(p => p.Name.Contains(term)).Select(p => p.Name).ToList();
+                var names = await _context.Tags.Where(p => p.Name.Contains(term)).Select(p => p.Name).ToListAsync();
                 return Ok(names);
             }
             catch
@@ -334,7 +340,7 @@ namespace Crowdfunding.Controllers
         }
 
         [HttpPost]
-        public JsonResult ToRate([FromBody] Rating rating)
+        public JsonResult Rate([FromBody] Rating rating)
         {
             var temp = _context.Ratings.AsNoTracking()
                 .FirstOrDefault(x => x.CompanyId == rating.CompanyId && x.UserName == rating.UserName);
@@ -381,5 +387,58 @@ namespace Crowdfunding.Controllers
                 return 0;
             }
         }
+
+        public async Task<IActionResult> GetViewByTag(string tagName)
+        {
+            var temp = await _context.Tags.Include(x => x.CompanyTags).FirstOrDefaultAsync(x => x.Name == tagName);
+            var companies = new List<Company>();
+            foreach(var comp in temp.CompanyTags)
+            {
+                companies.Add(await _context.Companies.Include(x => x.Images).Include(x => x.Category)
+                    .FirstOrDefaultAsync(x => x.Id == comp.CompanyId));
+            }
+            ViewBag.Tag = tagName;
+            return View(companies);
+        }
+
+        public async Task<IActionResult> GetViewByCategory(string categoryName)
+        {
+            var companies = await _context.Companies.Include(x => x.Images)
+                .Include(x => x.Category).Where(x => x.Category.Name == categoryName).ToListAsync();
+            ViewBag.Category = categoryName;
+            return View(companies);
+        }
+
+        public async Task<IActionResult> Search(string searchTerm)
+        {
+            
+            var companies = await _context.Companies.Include(x => x.Category)
+                            .Where(x => x.Name.Contains(searchTerm) ||
+                                    x.Description.Contains(searchTerm) ||
+                                    x.Category.Name.Contains(searchTerm)).ToListAsync();
+            
+            var comments = await _context.Comments.Where(x => x.Message.Contains(searchTerm)).Select(x => x.CompanyId).ToListAsync();
+            foreach (var id in comments)
+            {
+                var temp = await _context.Companies.FirstOrDefaultAsync(x => x.Id == id);
+                if (temp!= null && companies.FirstOrDefault(x => x.Id == temp.Id) == null)
+                {
+                    companies.Add(temp);
+                }                
+            }
+            var news = await _context.News.Where(x => x.Content.Contains(searchTerm)).Select(x => x.CompanyId).ToListAsync();
+            foreach (var id in news)
+            {
+                var temp = await _context.Companies.FirstOrDefaultAsync(x => x.Id == id);
+                if (temp != null && companies.FirstOrDefault(x => x.Id == temp.Id) == null)
+                {
+                    companies.Add(temp);
+                }                
+            }
+            ViewBag.Search = searchTerm;
+            return View(companies);
+        }
+
+        
     }
 }

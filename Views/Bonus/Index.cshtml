@@ -30,9 +30,13 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-            <td>
-                <a asp-action="PaymentCheck" asp-route-id="@item.Id">Support</a>
-            </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+                    <a asp-action="PaymentCheck" asp-route-id="@item.Id">Support</a>
+                </td>
+            }
+            
             @if (User.Identity.Name == item.Company.CustomUser.UserName || User.IsInRole("Admin") == true)
             {
                 <td>

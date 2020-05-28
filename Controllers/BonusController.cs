@@ -41,6 +41,7 @@ namespace Crowdfunding.Controllers
             return View(companyBonuses);
         }
 
+        [Authorize]
         public async Task<IActionResult> Create(int? companyId, List<string> modelErrors)
         {
             if (companyId == null)
@@ -60,6 +61,7 @@ namespace Crowdfunding.Controllers
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(int? companyId, Bonus bonus)
         {
@@ -86,6 +88,7 @@ namespace Crowdfunding.Controllers
             return RedirectToAction(nameof(Create), new { companyId = companyId, modelErrors = modelErrors});
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(int? id, int? companyId, List<string> modelErrors)
         {
             if (id == null || companyId == null)
@@ -110,6 +113,7 @@ namespace Crowdfunding.Controllers
             return View(bonus);
         }
 
+        [Authorize]
         [HttpPost]        
         public async Task<IActionResult> Edit(int? id, int? companyId, Bonus bonus)
         {            
@@ -137,6 +141,7 @@ namespace Crowdfunding.Controllers
                 modelErrors = modelErrors});
         }
 
+        [Authorize]
         public async Task<IActionResult> Delete(int? id, int? companyId)
         {
             if (id == null || companyId == null)
@@ -154,6 +159,7 @@ namespace Crowdfunding.Controllers
             return RedirectToAction(nameof(Index), new { companyId = companyId});
         }
 
+        [Authorize]
         public async Task<IActionResult> PaymentCheck(int? id)
         {
             var bonus = await _context.Bonuses.FirstOrDefaultAsync(x => x.Id == id);
@@ -163,7 +169,8 @@ namespace Crowdfunding.Controllers
             }            
             return View(bonus);
         }
-        
+
+        [Authorize]
         public async Task<IActionResult> Payment(int? bonusId)
         {            
             var bonus = await _context.Bonuses.Include(x => x.CustomUserBonus).FirstOrDefaultAsync(x => x.Id == bonusId);
@@ -187,6 +194,7 @@ namespace Crowdfunding.Controllers
             return RedirectToAction("Details", "Companies", new { id = bonus.CompanyId });
         }
 
+        [Authorize]
         public async Task<IActionResult> MyBonuses()
         {
             var user = await _context.Users.Include(x => x.CustomUserBonus)
