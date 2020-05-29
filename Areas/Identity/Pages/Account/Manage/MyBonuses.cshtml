@@ -1,33 +1,36 @@
-﻿@model IEnumerable<CustomUserBonus>
-
+﻿@page
+@model Crowdfunding.Areas.Identity.Pages.Account.Manage.MyBonusesModel
 @{
-    ViewData["Title"] = "My Bonuses";    
+    ViewData["Title"] = "My Bonuses";
+    ViewData["ActivePage"] = ManageNavPages.MyBonuses;
 }
 
 
+
+
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <table class="table">
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Bonus.Name)
+                        Bonus Name
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Bonus.Price)
+                        Price
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Bonus.Description)
+                        Description
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Bonus.Company.Name)
+                        Company Name
                     </th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
 
-                @foreach (var item in Model)
+                @foreach (var item in Model.CurrentUserBonuses)
                 {
                     @for (int i = 0; i < item.Count; i++)
                     {
@@ -60,4 +63,3 @@
         </table>
     </div>
 </div>
-

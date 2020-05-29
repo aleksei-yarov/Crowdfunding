@@ -213,3 +213,5 @@ C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Release
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Release\netcoreapp3.1\Crowdfunding.pdb
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Release\netcoreapp3.1\Crowdfunding.genruntimeconfig.cache
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Release\netcoreapp3.1\Razor\Views\Admin\CreateCategory.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Release\netcoreapp3.1\Razor\Areas\Identity\Pages\Account\Manage\MyBonuses.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Release\netcoreapp3.1\Razor\Areas\Identity\Pages\Account\Manage\MyCompanies.cshtml.g.cs

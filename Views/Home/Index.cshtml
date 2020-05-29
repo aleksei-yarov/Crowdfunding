@@ -27,9 +27,10 @@
                         <img src=@comp.Images.FirstOrDefault().Link style="max-width:250px;height:140px; margin-bottom:1rem; margin-top:1rem;">
                     </div>
                     <div class="col-md-6">
-                        <p>@comp.Name</p>
+                        <p>@comp.Name <span class="badge badge-warning">@comp.AverageRating</span></p>
                         <p>@comp.Category.Name</p>
-                        <p>@comp.CurrentMoney / @comp.TargetMoney</p>                                       
+                        <p>@comp.CurrentMoney / @comp.TargetMoney</p>
+                        
                     </div>
                 </div>
             </div>            
@@ -47,13 +48,10 @@
                         <img src=@comp.Images.FirstOrDefault().Link style="max-width:250px;height:140px; margin-bottom:1rem; margin-top:1rem;">
                     </div>
                     <div class="col-md-6">
-                        <p>@comp.Name</p>
+                        <p>@comp.Name <span class="badge badge-warning">@comp.AverageRating</span></p>
                         <p>@comp.Category.Name</p>
-                        <p>@comp.CurrentMoney / @comp.TargetMoney</p>
-                        @foreach (var tag in @comp.CompanyTags.ToList())
-                        {
-                            <span> @tag.Tag.Name</span>
-                        }
+                        <p>@comp.CurrentMoney / @comp.TargetMoney</p>      
+                        
                     </div>
                 </div>
             </div>

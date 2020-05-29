@@ -173,7 +173,7 @@ namespace Crowdfunding.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             var company = await _context.Companies.Include(x => x.CustomUser).Include(x => x.Bonuses)
-                .Include(x => x.Ratings)
+                .Include(x => x.Ratings).Include(x => x.News)
                 .Include(x =>x.Images).Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id == id);
             if (company == null)
             {

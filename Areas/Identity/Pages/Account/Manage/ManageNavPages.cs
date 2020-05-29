@@ -22,6 +22,8 @@ namespace Crowdfunding.Areas.Identity.Pages.Account.Manage
 
         public static string MyBonuses => "MyBonuses";
 
+        public static string MyCompanies => "MyCompanies";
+
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
         public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
@@ -35,6 +37,8 @@ namespace Crowdfunding.Areas.Identity.Pages.Account.Manage
         public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
 
         public static string MyBonusesNavClass(ViewContext viewContext) => PageNavClass(viewContext, MyBonuses);
+
+        public static string MyCompaniesNavClass(ViewContext viewContext) => PageNavClass(viewContext, MyCompanies);
 
         private static string PageNavClass(ViewContext viewContext, string page)
         {

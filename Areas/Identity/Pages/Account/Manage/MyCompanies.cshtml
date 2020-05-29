@@ -1,0 +1,57 @@
+﻿@page
+@model Crowdfunding.Areas.Identity.Pages.Account.Manage.MyCompaniesModel
+@{
+    ViewData["Title"] = "My Bonuses";
+    ViewData["ActivePage"] = ManageNavPages.MyCompanies;
+}
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Company Name
+                </th>
+                <th>
+                    Amount needed
+                </th>
+                <th>
+                    Final Date
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Creator
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Companies)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TargetMoney)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CustomUser.UserName)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

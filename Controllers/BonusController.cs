@@ -199,7 +199,7 @@ namespace Crowdfunding.Controllers
         {
             var user = await _context.Users.Include(x => x.CustomUserBonus)
                 .ThenInclude(x => x.Bonus).ThenInclude(x => x.Company).FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
-            
+
             return View(user.CustomUserBonus);
         }
         public List<string> GetModelErrors(ModelStateDictionary modelState)
