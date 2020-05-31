@@ -22,6 +22,7 @@ namespace Crowdfunding.Controllers
         private readonly ApplicationDbContext _context;
         public UserManager<CustomUser> _userManager { get; }
         public IWebHostEnvironment _appEnvironment { get; }
+        
 
         public CompaniesController(ApplicationDbContext context, UserManager<CustomUser> manager,
             IWebHostEnvironment appEnvironment)
@@ -29,6 +30,20 @@ namespace Crowdfunding.Controllers
             _context = context;
             _userManager = manager;
             _appEnvironment = appEnvironment;
+        }
+
+        public enum SortState
+        {
+            NameAsc,    
+            NameDesc,   
+            MoneyAsc,
+            MoneyDesc,            
+            DateAsc,
+            DateDesc,
+            CategoryAsc,
+            CategoryDesc,
+            UserAsc,
+            UserDesc
         }
 
         // GET: Companies
@@ -41,11 +56,33 @@ namespace Crowdfunding.Controllers
 
         }
 
-        public async Task<IActionResult> AllCompanies()
+        public async Task<IActionResult> AllCompanies(SortState sortOrder = SortState.NameAsc)
         {            
-           var allCompany = _context.Companies.Include(c => c.CustomUser).Include(x => x.Category)
-                .Include(x => x.CompanyTags).ThenInclude(x => x.Tag);
-           return View(await allCompany.ToListAsync()); 
+           var allCompany = await _context.Companies.Include(c => c.CustomUser).Include(x => x.Category)
+                .Include(x => x.CompanyTags).ThenInclude(x => x.Tag).ToListAsync();
+
+            ViewData["NameSort"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
+            ViewData["MoneySort"] = sortOrder == SortState.MoneyAsc ? SortState.MoneyDesc : SortState.MoneyAsc;
+            ViewData["DateSort"] = sortOrder == SortState.DateAsc ? SortState.DateDesc : SortState.DateAsc;
+            ViewData["CategorySort"] = sortOrder == SortState.CategoryAsc ? SortState.CategoryDesc : SortState.CategoryAsc;
+            ViewData["UserSort"] = sortOrder == SortState.UserAsc ? SortState.UserDesc : SortState.UserAsc;
+
+            var model = sortOrder switch
+            {
+                SortState.NameAsc => allCompany.OrderBy(x => x.Name),
+                SortState.NameDesc => allCompany.OrderByDescending(x => x.Name),
+                SortState.MoneyAsc => allCompany.OrderBy(x => x.TargetMoney),
+                SortState.MoneyDesc => allCompany.OrderByDescending(x => x.TargetMoney),
+                SortState.DateAsc => allCompany.OrderBy(x => x.EndDate),
+                SortState.DateDesc => allCompany.OrderByDescending(x => x.EndDate),
+                SortState.CategoryAsc => allCompany.OrderBy(x => x.Category.Name),
+                SortState.CategoryDesc => allCompany.OrderByDescending(x => x.Category.Name),
+                SortState.UserAsc => allCompany.OrderBy(x => x.CustomUser.UserName),
+                SortState.UserDesc => allCompany.OrderByDescending(x => x.CustomUser.UserName),
+
+            };
+
+            return View(model); 
         }
 
         // GET: Companies/Details/5
@@ -57,17 +94,14 @@ namespace Crowdfunding.Controllers
             }             
             var company = await _context.Companies
                 .Include(c => c.CustomUser).Include(x => x.Category).Include(x => x.Bonuses)
-                .Include(x => x.Comments).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
+                .Include(x => x.Comments).ThenInclude(x => x.Votes).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
                 .Include(x => x.News).Include(x => x.Images).FirstOrDefaultAsync(m => m.Id == id);
             if (company == null)
             {
                 return NotFound();
             }            
-            var temp = company.Comments;
-            temp.Reverse();
-            ViewBag.Comments = temp;
-            ViewBag.AverageRating = Math.Round(GetRating(company.Id), 2);
-            ViewBag.UserRating = GetUserRating(User.Identity.Name, id);
+            company.Comments.Reverse();            
+            ViewBag.UserRating = GetUserRating(User.Identity.Name, id);            
             return View(company);
         }
 
@@ -348,15 +382,17 @@ namespace Crowdfunding.Controllers
             if (temp == null)
             {
                 _context.Add(rating);
+                _context.SaveChanges();
             }
             else
             {
                 rating.Id = temp.Id;
                 _context.Update(rating);
+                _context.SaveChanges();
             }
             company.AverageRating = GetRating(company.Id);            
             _context.SaveChanges();            
-            return Json(new { companyRating = GetRating(rating.CompanyId) });
+            return Json(new { companyRating = company.AverageRating });
         }
 
         public double GetRating(int? companyId)
@@ -439,6 +475,45 @@ namespace Crowdfunding.Controllers
             return View(companies);
         }
 
-        
+        [HttpPost]
+        public JsonResult Vote([FromBody] Vote vote)
+        {
+            var temp = _context.Votes.AsNoTracking().FirstOrDefault(x => x.Username == vote.Username && x.CommentId == vote.CommentId);
+            if (temp == null)
+            {
+                _context.Add(vote);
+            }
+            else
+            {
+                vote.Id = temp.Id;
+                _context.Update(vote);
+            }
+            
+            _context.SaveChanges();
+
+
+            return Json(new { result = GetVotes(vote.CommentId) });
+        }
+
+        public int GetVotes(int? commentId)
+        {
+            var comment = _context.Comments.Include(x => x.Votes).FirstOrDefault(x => x.Id == commentId);
+            var result = 0;
+            if (comment == null)
+            {
+                return 0;
+            }
+            else
+            {
+                foreach (var item in comment.Votes)
+                {
+                    result += item.Value;
+                }
+                comment.VoteResult = result;
+                _context.SaveChanges();
+                return result;
+            }
+        }
+
     }
 }

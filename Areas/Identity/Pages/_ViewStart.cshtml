@@ -1,3 +1,11 @@
 ﻿@{
-    Layout = "/Views/Shared/_Layout.cshtml";
+    if (Context.Request.Cookies[User.Identity.Name] == "Dark")
+    {
+        Layout = "_LayoutDark";
+    }
+    else
+    {
+        Layout = "/Views/Shared/_Layout.cshtml";
+    }
+
 }

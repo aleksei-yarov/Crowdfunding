@@ -46,3 +46,28 @@ html {
 textarea {
     white-space: pre-line;
 }
+
+
+.footer-comment {
+    color: #777;
+}
+
+.vote.plus:hover {
+    color: green;
+}
+
+.vote.minus:hover {
+    color: red;
+}
+
+.vote {
+    cursor: pointer;
+}
+
+.voteCheck.plus {
+    color: green;
+}
+
+.voteCheck.minus {
+    color: red;
+}

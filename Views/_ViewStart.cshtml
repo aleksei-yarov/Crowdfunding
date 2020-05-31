@@ -1,3 +1,11 @@
 ﻿@{
-    Layout = "_Layout";
+    if (Context.Request.Cookies[User.Identity.Name] == "Dark")
+    {
+        Layout = "_LayoutDark";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
+
 }

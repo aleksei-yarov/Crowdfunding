@@ -215,3 +215,5 @@ C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\bin\Debug\n
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Admin\CreateCategory.cshtml.g.cs
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\Account\Manage\MyBonuses.cshtml.g.cs
 C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\Account\Manage\MyCompanies.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_LayoutDark.cshtml.g.cs
+C:\Users\Галицкая Ангелина\source\repos\Crowdfunding\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_LoginPartialDark.cshtml.g.cs

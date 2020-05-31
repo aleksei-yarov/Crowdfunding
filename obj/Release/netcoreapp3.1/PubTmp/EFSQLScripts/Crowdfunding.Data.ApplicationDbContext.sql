@@ -841,3 +841,47 @@ END;
 
 GO
 
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200529112409_v29')
+BEGIN
+    CREATE TABLE [Votes] (
+        [Id] int NOT NULL IDENTITY,
+        [Value] int NOT NULL,
+        [Username] nvarchar(max) NULL,
+        [CommentId] int NULL,
+        CONSTRAINT [PK_Votes] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Votes_Comments_CommentId] FOREIGN KEY ([CommentId]) REFERENCES [Comments] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200529112409_v29')
+BEGIN
+    CREATE INDEX [IX_Votes_CommentId] ON [Votes] ([CommentId]);
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200529112409_v29')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20200529112409_v29', N'3.1.3');
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200529123850_v30')
+BEGIN
+    ALTER TABLE [Comments] ADD [VoteResult] int NOT NULL DEFAULT 0;
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200529123850_v30')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20200529123850_v30', N'3.1.3');
+END;
+
+GO
+

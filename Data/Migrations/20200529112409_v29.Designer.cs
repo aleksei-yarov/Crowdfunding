@@ -4,14 +4,16 @@ using Crowdfunding.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crowdfunding.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200529112409_v29")]
+    partial class v29
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,9 +82,6 @@ namespace Crowdfunding.Data.Migrations
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VoteResult")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

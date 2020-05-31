@@ -21,7 +21,7 @@ namespace Crowdfunding.Hubs
                 Message = message, UserName = userName, Date=dateTime};
             await _context.AddAsync(newComment);
             await _context.SaveChangesAsync();
-            await this.Clients.All.SendAsync("Send", message, userName, companyId, dateTime);
+            await this.Clients.All.SendAsync("Send", message, userName, companyId, dateTime, newComment.Id);
         }
     }
 }

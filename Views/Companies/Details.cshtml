@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="~/css/gallery.css" />
 <link rel="stylesheet" href="~/lib/ckeditor/plugins/easyimage/styles/easyimage.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 
 <input type="hidden" value="@User.Identity.Name" id="currentUser" />
@@ -75,7 +76,7 @@
 
                         }
                     }
-                    <span class="badge badge-warning" id="companyRating">@ViewBag.AverageRating</span>
+                    <span class="badge badge-warning" id="companyRating">@Model.AverageRating</span>
                 </div>
             </div>
 
@@ -201,7 +202,7 @@
         <div class="comments">
             <h3 class="title-comments">Comments</h3>
             <ul class="media-list" id="commentsBoard">
-                @foreach (var comment in ViewBag.Comments)
+                @foreach (var comment in Model.Comments)
                 {
                     <li class="media">
                         <div class="media-body">
@@ -212,6 +213,34 @@
                                 </div>
                             </div>
                             <div class="media-text text-justify">@comment.Message</div>
+                            <div class="footer-comment" data-commentId="@comment.Id" id="commentId-@comment.Id">
+                                <span class="vote plus" title="Like" data-val="1">
+                                    <i class="fa fa-thumbs-up"></i>
+                                </span>
+                                <span class="vote minus" title="Dislike" data-val="-1">
+                                    <i class="fa fa-thumbs-down"></i>
+                                </span>
+                                <span class="voteResult">
+                                    @comment.VoteResult
+                                </span>
+                            </div>
+                            @foreach (var vote in comment.Votes)
+                            {
+                                if (vote.Username == User.Identity.Name && vote.Value == 1)
+                                {
+                                    <script>
+                                        $("#commentId-" + @comment.Id).children(".plus").addClass("voteCheck");                                        
+                                    </script>
+                                    break;
+                                }
+                                if (vote.Username == User.Identity.Name && vote.Value == -1)
+                                {
+                                    <script>
+                                        $("#commentId-" + @comment.Id).children(".minus").addClass("voteCheck");
+                                    </script>
+                                    break;
+                                }
+                            }
                             <hr>
                         </div>
                     </li>
@@ -231,7 +260,7 @@
         $(".tablinks").on("click", function (event) {
             $(".tabcontent").hide();
             $("#" + event.target.getAttribute("value")).fadeIn(1000);
-        })
+                                    })
         $("#defaultTab").trigger("click");
     </script>
 
@@ -244,36 +273,36 @@
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/companies/index").build();
 
-        hubConnection.on("Send", function (message, userName, companyId, dateTime) {
-            if (companyId != $("#companyId").val()) { return }
-            CreateComment(message, userName, dateTime);
-        })
+                                hubConnection.on("Send", function (message, userName, companyId, dateTime, commentId) {
+                                    if (companyId != $("#companyId").val()) { return }
+                                    CreateComment(message, userName, dateTime, commentId);
+                                })
 
         $("#btnSend").on("click", function () {
-            hubConnection.invoke("Send", $("#inputComment").val(), $("#userName").val(),
-                $("#companyId").val(), GetCurrentTime());
+                                    hubConnection.invoke("Send", $("#inputComment").val(), $("#userName").val(),
+                                        $("#companyId").val(), GetCurrentTime());
             $("#inputComment").val("");
-        })
+                                })
 
         hubConnection.start();
 
         function GetCurrentTime() {
-            let
-                now = new Date(),
-                date = now.getDate(),
-                month = now.getMonth(),
-                year = now.getFullYear(),
-                hour = now.getHours(),
-                minute = now.getMinutes(),
-                second = now.getSeconds();
+                                    let
+                                        now = new Date(),
+                                        date = now.getDate(),
+                                        month = now.getMonth(),
+                                        year = now.getFullYear(),
+                                        hour = now.getHours(),
+                                        minute = now.getMinutes(),
+                                        second = now.getSeconds();
 
-            minute = (minute < 10) ? '0' + minute : minute;
-            second = (second < 10) ? '0' + second : second;
-            hour = (hour < 10) ? '0' + hour : hour;
-            return (date + "." + month + "." + year + "  " + hour + ":" + minute + ":" + second);
-        }
+                                    minute = (minute < 10) ? '0' + minute : minute;
+                                    second = (second < 10) ? '0' + second : second;
+                                    hour = (hour < 10) ? '0' + hour : hour;
+                                    return (date + "." + month + "." + year + "  " + hour + ":" + minute + ":" + second);
+                                }
 
-        function CreateComment(message, userName, dateTime) {
+                                function CreateComment(message, userName, dateTime, commentId) {
             $("<li class='media'>" +
                 "<div class='media-body'>" +
                 "<div class='media-heading'>" +
@@ -283,10 +312,20 @@
                 "</div>" +
                 "</div>" +
                 "<div class='media-text text-justify'>" + message + "</div>" +
+                "<div class='footer-comment' data-commentId =" + commentId + " >" +
+                                "<span class='vote plus' title='Like' data-val='1'>" +
+                                    "<i class='fa fa-thumbs-up'></i>" +
+                                "</span>" +
+                                "<span class='vote minus' title='Dislike' data-val='-1'>" +
+                                    " <i class='fa fa-thumbs-down'></i>" +
+                                "</span>" +
+                                "<span class='voteResult'> 0" +
+                                "</span>" +
+                            "</div>" +
                 "<hr>" +
                 "</div>" +
                 "</li>").prependTo($("#commentsBoard")).hide().fadeIn(1000);
-        }
+                                }
     </script>
 
 
@@ -434,8 +473,7 @@
                 $(this).prevAll().addClass('starCheck');
                 $(this).addClass('starCheck');
                 $(this).nextAll(".starCheck").removeClass("starCheck");
-                let rating = { "CompanyId": @Model.Id, "Value": Number($(this).attr("data-val")) + 1, "UserName": $("#currentUser").val() }
-                console.log(rating);
+                let rating = { "CompanyId": @Model.Id, "Value": Number($(this).attr("data-val")) + 1, "UserName": $("#currentUser").val() }                
                 $.ajax({
                     type: "POST",
                     url: "/Companies/Rate",
@@ -457,6 +495,33 @@
                     $(this).removeClass('starHover');
                 }
             )
+        })
+    </script>
+
+    <script>
+        //vote
+        $(document).ready(function () {
+            $("body").on("click", ".vote", function () {
+                $(this).toggleClass("voteCheck");
+                $(this).siblings(".vote").removeClass("voteCheck");
+                let voteValue = 0;
+                if ($(this).hasClass("voteCheck")) {
+                    voteValue = $(this).attr("data-val")
+                }
+                let vote = { "CommentId": Number($(this).parent().attr("data-commentId")), "Value": Number(voteValue), "Username": $("#currentUser").val() }
+                let voteResult = $(this).siblings(".voteResult");
+                $.ajax({
+                    type: "POST",
+                    url: "/Companies/Vote",
+                    data: JSON.stringify(vote),
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (responce) {
+                        console.log(responce.result);
+                        voteResult.text(responce.result);
+                    }
+                });
+            }) 
 
         })
     </script>

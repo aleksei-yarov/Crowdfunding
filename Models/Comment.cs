@@ -11,7 +11,9 @@ namespace Crowdfunding.Models
         public string Message { get; set; }
         public string Date { get; set; }
         public string UserName { get; set; }
+        public int VoteResult { get; set; }
         public int? CompanyId { get; set; }
         public Company Company { get; set; }       
+        public List<Vote> Votes { get; set; }
     }
 }
