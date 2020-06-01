@@ -22,9 +22,11 @@ namespace Crowdfunding.Models
         [Required]
         public double TargetMoney { get; set; }
         public double CurrentMoney { get; set; }
+        [Required]
         public DateTime? EndDate { get; set; }
         public DateTime? RegDate { get; set; }
 
+        [Required]
         [RegularExpression(@"https://www.youtube.com/watch\?v=.{11}", ErrorMessage = "Invalid url")]
         public string YoutubeSrc { get; set; }
         public double AverageRating { get; set; }

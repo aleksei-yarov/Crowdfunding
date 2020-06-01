@@ -6,19 +6,19 @@
     <thead>
         <tr>
             <th>
-                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewData["NameSort"]>Company Name</a>
+                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewBag.SortState["NameSort"]>Company Name</a>
             </th>            
             <th>
-                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewData["MoneySort"]>Money Target</a>
+                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewBag.SortState["MoneySort"]>Money Target</a>
             </th>
             <th>
-                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewData["DateSort"]>End Date</a>
+                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewBag.SortState["DateSort"]>End Date</a>
             </th>
             <th>
-                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewData["CategorySort"]>Category</a>
+                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewBag.SortState["CategorySort"]>Category</a>
             </th>            
             <th>
-                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewData["UserSort"]>User</a>
+                <a asp-action="AllCompanies" asp-route-sortOrder=@ViewBag.SortState["UserSort"]>User</a>
             </th>
             <th></th>
         </tr>
@@ -37,7 +37,7 @@
                     @Html.DisplayFor(modelItem => item.EndDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Category.Name)
+                    <a asp-action="GetViewByCategory" asp-route-categoryName="@item.Category.Name">@item.Category.Name</a>
                 </td>                
                 <td>
                     @Html.DisplayFor(modelItem => item.CustomUser.UserName)

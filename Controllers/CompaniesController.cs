@@ -48,40 +48,26 @@ namespace Crowdfunding.Controllers
 
         // GET: Companies
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(SortState sortOrder = SortState.NameAsc)
         {            
-            var applicationDbContext = _context.Companies.Include(c => c.CustomUser).Where(x => x.CustomUser.UserName == User.Identity.Name)
-                .Include(c => c.Category).Include(x => x.Bonuses);
-            return View(await applicationDbContext.ToListAsync());
+            var allCompany = await _context.Companies.Include(c => c.CustomUser).Where(x => x.CustomUser.UserName == User.Identity.Name)
+                .Include(c => c.Category).Include(x => x.Bonuses).ToListAsync();   
+            
+            ViewBag.SortState = GetSortStateDict(sortOrder);                        
+            var model = GetSortedModel(allCompany, sortOrder);
+            return View(model);
 
         }
+
+       
 
         public async Task<IActionResult> AllCompanies(SortState sortOrder = SortState.NameAsc)
         {            
            var allCompany = await _context.Companies.Include(c => c.CustomUser).Include(x => x.Category)
                 .Include(x => x.CompanyTags).ThenInclude(x => x.Tag).ToListAsync();
 
-            ViewData["NameSort"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
-            ViewData["MoneySort"] = sortOrder == SortState.MoneyAsc ? SortState.MoneyDesc : SortState.MoneyAsc;
-            ViewData["DateSort"] = sortOrder == SortState.DateAsc ? SortState.DateDesc : SortState.DateAsc;
-            ViewData["CategorySort"] = sortOrder == SortState.CategoryAsc ? SortState.CategoryDesc : SortState.CategoryAsc;
-            ViewData["UserSort"] = sortOrder == SortState.UserAsc ? SortState.UserDesc : SortState.UserAsc;
-
-            var model = sortOrder switch
-            {
-                SortState.NameAsc => allCompany.OrderBy(x => x.Name),
-                SortState.NameDesc => allCompany.OrderByDescending(x => x.Name),
-                SortState.MoneyAsc => allCompany.OrderBy(x => x.TargetMoney),
-                SortState.MoneyDesc => allCompany.OrderByDescending(x => x.TargetMoney),
-                SortState.DateAsc => allCompany.OrderBy(x => x.EndDate),
-                SortState.DateDesc => allCompany.OrderByDescending(x => x.EndDate),
-                SortState.CategoryAsc => allCompany.OrderBy(x => x.Category.Name),
-                SortState.CategoryDesc => allCompany.OrderByDescending(x => x.Category.Name),
-                SortState.UserAsc => allCompany.OrderBy(x => x.CustomUser.UserName),
-                SortState.UserDesc => allCompany.OrderByDescending(x => x.CustomUser.UserName),
-
-            };
-
+            ViewBag.SortState = GetSortStateDict(sortOrder);
+            var model = GetSortedModel(allCompany, sortOrder);
             return View(model); 
         }
 
@@ -303,6 +289,7 @@ namespace Crowdfunding.Controllers
 
         private void SaveImages(string Images, string companyName)
         {
+
             if (Images != null && companyName != null)
             {
                 var imagesLink = Images.Split(".....");
@@ -310,6 +297,11 @@ namespace Crowdfunding.Controllers
                 var companyId = _context.Companies.FirstOrDefault(x => x.Name == companyName).Id;
                 if (companyId != 0)
                 {
+                    var oldImg = _context.Images.Where(x => x.CompanyId == companyId).ToList();
+                    foreach (var image in oldImg)
+                    {
+                        _context.Images.Remove(image);
+                    }
                     foreach(var link in imagesLink)
                     {
                         var image = new Image { Link = link, CompanyId = companyId };
@@ -513,6 +505,37 @@ namespace Crowdfunding.Controllers
                 _context.SaveChanges();
                 return result;
             }
+        }
+
+        private object GetSortedModel(List<Company> allCompany, SortState sortOrder)
+        {
+            var model = sortOrder switch
+            {
+                SortState.NameAsc => allCompany.OrderBy(x => x.Name),
+                SortState.NameDesc => allCompany.OrderByDescending(x => x.Name),
+                SortState.MoneyAsc => allCompany.OrderBy(x => x.TargetMoney),
+                SortState.MoneyDesc => allCompany.OrderByDescending(x => x.TargetMoney),
+                SortState.DateAsc => allCompany.OrderBy(x => x.EndDate),
+                SortState.DateDesc => allCompany.OrderByDescending(x => x.EndDate),
+                SortState.CategoryAsc => allCompany.OrderBy(x => x.Category.Name),
+                SortState.CategoryDesc => allCompany.OrderByDescending(x => x.Category.Name),
+                SortState.UserAsc => allCompany.OrderBy(x => x.CustomUser.UserName),
+                SortState.UserDesc => allCompany.OrderByDescending(x => x.CustomUser.UserName),
+
+            };
+            return model;
+        }
+
+        private Dictionary<string, SortState> GetSortStateDict(SortState sortOrder)
+        {
+            return new Dictionary<string, SortState>
+            {
+                ["NameSort"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc,
+                ["MoneySort"] = sortOrder == SortState.MoneyAsc ? SortState.MoneyDesc : SortState.MoneyAsc,
+                ["DateSort"] = sortOrder == SortState.DateAsc ? SortState.DateDesc : SortState.DateAsc,
+                ["CategorySort"] = sortOrder == SortState.CategoryAsc ? SortState.CategoryDesc : SortState.CategoryAsc,
+                ["UserSort"] = sortOrder == SortState.UserAsc ? SortState.UserDesc : SortState.UserAsc
+            };            
         }
 
     }

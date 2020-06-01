@@ -126,24 +126,7 @@ namespace Crowdfunding.Controllers
             }
             return RedirectToAction("Index");
         }
-
-        public async Task<IActionResult> Start()
-        {
-            if (await _roleManager.FindByNameAsync("Admin") == null)
-            {
-                await _roleManager.CreateAsync(new IdentityRole("Admin"));
-                if (await _userManager.FindByNameAsync("admin") == null)
-                {
-                    CustomUser admin = new CustomUser { Email = "admin@admin.by", UserName = "admin" };
-                    IdentityResult result = await _userManager.CreateAsync(admin, "admin");
-                    if (result.Succeeded)
-                    {
-                        await _userManager.AddToRoleAsync(admin, "Admin");
-                    }
-                }
-            }
-            return NoContent();
-        }
+               
 
 
         public async Task<IActionResult> CreateCategory()

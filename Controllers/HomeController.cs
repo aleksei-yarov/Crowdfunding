@@ -30,13 +30,12 @@ namespace Crowdfunding.Controllers
         }
 
         public IActionResult Index()
-        {
-
+        {            
             var topNew = _context.Companies.Include(x => x.Images).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
-                .Include(x => x.Category).OrderBy(x => x.RegDate).Take(15).ToList();
+                .Include(x => x.Category).OrderByDescending(x => x.RegDate).Take(3).ToList();
             
             var topRate = _context.Companies.Include(x => x.Images).Include(x => x.CompanyTags).ThenInclude(x => x.Tag)
-                .Include(x => x.Category).OrderByDescending(x => x.AverageRating).Take(15).ToList();
+                .Include(x => x.Category).OrderByDescending(x => x.AverageRating).Take(3).ToList();
             var model = new ModelStartPage { topNew = topNew, topRate = topRate };
 
             ViewBag.Tags = GetNotNullTags();

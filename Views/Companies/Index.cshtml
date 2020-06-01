@@ -4,20 +4,17 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                <a asp-action="Index" asp-route-sortOrder="@ViewBag.SortState["NameSort"]">Company Name</a>
             </th>            
             <th>
-                @Html.DisplayNameFor(model => model.TargetMoney)
+                <a asp-action="Index" asp-route-sortOrder="@ViewBag.SortState["MoneySort"]">Money Target</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EndDate)
+                <a asp-action="Index" asp-route-sortOrder="@ViewBag.SortState["DateSort"]">End Date</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomUser)
-            </th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewBag.SortState["CategorySort"]">Category</a>
+            </th>            
             <th></th>
         </tr>
     </thead>
@@ -34,18 +31,25 @@
                 @Html.DisplayFor(modelItem => item.EndDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
-            </td>
+                <a asp-action="GetViewByCategory" asp-route-categoryName="@item.Category.Name">@item.Category.Name</a>
+            </td>            
             <td>
-                @Html.DisplayFor(modelItem => item.CustomUser.UserName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id" class="deleteCompany">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
 
+@section Scripts{
+<script>
+    $(".deleteCompany").on("click", function (event) {
+        event.preventDefault();
+        let isDelete = confirm("Are you sure?");
+        if (isDelete == false) { return }
+        window.location.href = $(this).attr("href");
+    })        
+</script>
+}
